@@ -113,6 +113,13 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Sego
 
 .input-hint { font-size: 11px; color: var(--text-dimmer); margin-top: 6px; }
 
+/* Feedback bar */
+.feedback-bar { display: flex; align-items: center; gap: 8px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); }
+.feedback-label { font-size: 12px; color: var(--text-dimmer); }
+.feedback-btn { background: transparent; border: 1px solid var(--border); border-radius: 6px; padding: 3px 8px; cursor: pointer; font-size: 14px; transition: all 0.15s; }
+.feedback-btn:hover { border-color: var(--orange); background: rgba(232,80,10,0.08); }
+.feedback-thanks { font-size: 12px; color: var(--bmu); }
+
 /* Responsive */
 @media (max-width: 700px) {
   .sidebar { display: none; }

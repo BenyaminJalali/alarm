@@ -124,9 +124,10 @@
       }
 
       history.push({ role: "assistant", content: fullText });
+      addFeedback(assistantEl, text, fullText);
     } catch (err) {
       typing.remove();
-      appendMessage("assistant", `Error: ${err.message}. Please try again.`);
+      appendMessage("assistant", "Sorry, something went wrong on my end. Please try again in a moment — if it keeps happening, try refreshing the page.");
     } finally {
       isStreaming = false;
       sendBtn.disabled = !inputEl.value.trim();
@@ -162,6 +163,33 @@
 
   function scrollToBottom() {
     messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  // ── Feedback ───────────────────────────────────────────────────────────────
+  function addFeedback(msgEl, question, answer) {
+    const bar = document.createElement("div");
+    bar.className = "feedback-bar";
+    bar.innerHTML = `
+      <span class="feedback-label">Was this helpful?</span>
+      <button class="feedback-btn up" title="Yes, helpful">👍</button>
+      <button class="feedback-btn down" title="Not helpful">👎</button>
+      <span class="feedback-thanks" style="display:none">Thanks for the feedback!</span>
+    `;
+    msgEl.appendChild(bar);
+
+    bar.querySelector(".up").addEventListener("click", () => sendFeedback("up", question, answer, bar));
+    bar.querySelector(".down").addEventListener("click", () => sendFeedback("down", question, answer, bar));
+  }
+
+  function sendFeedback(rating, question, answer, bar) {
+    fetch("/api/feedback", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ rating, audience: currentRole, question, answer }),
+    });
+    bar.querySelectorAll(".feedback-btn").forEach(b => b.style.display = "none");
+    bar.querySelector(".feedback-label").style.display = "none";
+    bar.querySelector(".feedback-thanks").style.display = "inline";
   }
 
   // ── Markdown renderer (minimal, no deps) ───────────────────────────────────

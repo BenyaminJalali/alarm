@@ -33,22 +33,22 @@
       <div class="sidebar-section">
         <div class="section-label">Devices</div>
         <div class="device-tags">
-          <span class="tag inv">INV</span>
-          <span class="tag bmu">BMU</span>
-          <span class="tag gms">GMS</span>
-          <span class="tag manta">MANTA</span>
+          <span class="tag inv">Inverter</span>
+          <span class="tag bmu">Battery</span>
+          <span class="tag gms">Gateway</span>
+          <span class="tag manta">Smart Disconnect</span>
         </div>
       </div>
 
       <div class="sidebar-section">
-        <div class="section-label">Quick Examples</div>
+        <div class="section-label">Try asking...</div>
         <div class="examples">
-          <button class="example-btn" data-msg="The battery keeps shutting off">Battery shutting off</button>
-          <button class="example-btn" data-msg="ALARM_BSTOP on the inverter">ALARM_BSTOP</button>
-          <button class="example-btn" data-msg="DC wiring ground fault on BMU">DC ground fault</button>
-          <button class="example-btn" data-msg="Self-test failed on inverter during install">Self-test failed</button>
-          <button class="example-btn" data-msg="CAN communication errors between devices">CAN comms error</button>
-          <button class="example-btn" data-msg="Grid relay stuck closed on GMS">Grid relay stuck</button>
+          <button class="example-btn" data-msg="The battery keeps shutting off on its own, what should I check?">Battery keeps shutting off</button>
+          <button class="example-btn" data-msg="There is a ground fault warning on the battery, what does that mean and what do I do?">Ground fault on battery</button>
+          <button class="example-btn" data-msg="The inverter shows a wiring error, what could be wrong?">Inverter wiring error</button>
+          <button class="example-btn" data-msg="Self-test failed during installation, how do I fix it?">Self-test failed at install</button>
+          <button class="example-btn" data-msg="The devices are not communicating with each other, what should I check?">Devices not communicating</button>
+          <button class="example-btn" data-msg="The grid relay seems to be stuck, what does that mean?">Grid relay stuck</button>
         </div>
       </div>
 
@@ -61,24 +61,24 @@
     <!-- Main chat -->
     <main class="chat-main">
       <div class="chat-header">
-        <div class="chat-title">R2 Fault Diagnostic Assistant</div>
-        <div class="chat-subtitle">Describe a symptom, enter an alarm code, or ask about a device fault</div>
+        <div class="chat-title">Generac Home Energy Troubleshooting Assistant</div>
+        <div class="chat-subtitle">Describe what you're seeing — no alarm codes needed</div>
       </div>
 
       <div class="messages" id="messages">
         <div class="message assistant">
           <div class="message-avatar">G</div>
           <div class="message-content">
-            <p>Hello! I'm the Generac R2 Fault Advisor.</p>
-            <p>I can help you diagnose and resolve alarms on the R2 platform — Inverter (INV), Battery Management Unit (BMU), Grid Management Switch (GMS), and the Manta/PLCHE controller.</p>
-            <p>You can:</p>
+            <p>Hi! I'm here to help you troubleshoot your Generac Home Energy system — in plain language.</p>
+            <p>Just describe what you're seeing. You don't need to know any alarm codes.</p>
+            <p>For example:</p>
             <ul>
-              <li>Describe a symptom ("the battery keeps shutting off")</li>
-              <li>Enter an alarm name ("ALARM_BSTOP")</li>
-              <li>Enter an alarm code ("0xb035")</li>
-              <li>Ask about a self-test failure during install</li>
+              <li>"The battery keeps shutting off"</li>
+              <li>"There's a ground fault warning"</li>
+              <li>"The system won't turn back on after an outage"</li>
+              <li>"Self-test failed during installation"</li>
             </ul>
-            <p>Select your role on the left so I can tailor my response to the right level of detail. How can I help?</p>
+            <p>Select your role on the left — Installer, Support, or Homeowner — so I know how much detail to give you. What's going on?</p>
           </div>
         </div>
       </div>
