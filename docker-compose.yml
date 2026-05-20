@@ -1,0 +1,14 @@
+services:
+  alarm-agent:
+    build: .
+    ports:
+      - "8082:8082"
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+    volumes:
+      - alarm_data:/app/data
+    restart: unless-stopped
+
+volumes:
+  alarm_data:
