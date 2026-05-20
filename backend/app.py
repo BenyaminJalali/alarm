@@ -2,7 +2,7 @@ import os
 import json
 from pathlib import Path
 from flask import Flask, request, jsonify, render_template, Response, stream_with_context
-import anthropic
+import boto3
 
 app = Flask(
     __name__,
@@ -10,7 +10,9 @@ app = Flask(
     static_folder=str(Path(__file__).parent.parent / "frontend" / "static"),
 )
 
-ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
+AWS_REGION = os.environ.get("AWS_REGION", "us-east-1")
+# Claude Sonnet 4.6 on Bedrock
+BEDROCK_MODEL_ID = os.environ.get("BEDROCK_MODEL_ID", "us.anthropic.claude-sonnet-4-6")
 KB_PATH = Path(__file__).parent.parent / "data" / "knowledge_base.json"
 
 _knowledge_base: dict | None = None
@@ -127,13 +129,9 @@ def chat():
     if not messages:
         return jsonify({"error": "No messages provided"}), 400
 
-    if not ANTHROPIC_API_KEY:
-        return jsonify({"error": "ANTHROPIC_API_KEY not configured"}), 500
-
     kb_context = build_context_block()
     system = SYSTEM_PROMPT.format(kb_context=kb_context)
 
-    # Prepend audience context to system prompt
     audience_note = {
         "support": "The current user is internal SUPPORT/TSE staff. Provide full technical detail including internal notes.",
         "installer": "The current user is an INSTALLER/DEALER. Provide diagnostic steps and corrective actions.",
@@ -142,17 +140,28 @@ def chat():
     if audience_note:
         system = audience_note + "\n\n" + system
 
-    client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+    bedrock = boto3.client("bedrock-runtime", region_name=AWS_REGION)
+
+    body = json.dumps({
+        "anthropic_version": "bedrock-2023-05-31",
+        "max_tokens": 1024,
+        "system": system,
+        "messages": messages,
+    })
 
     def generate():
-        with client.messages.stream(
-            model="claude-sonnet-4-6",
-            max_tokens=1024,
-            system=system,
-            messages=messages,
-        ) as stream:
-            for text in stream.text_stream:
-                yield f"data: {json.dumps({'text': text})}\n\n"
+        response = bedrock.invoke_model_with_response_stream(
+            modelId=BEDROCK_MODEL_ID,
+            contentType="application/json",
+            accept="application/json",
+            body=body,
+        )
+        for event in response["body"]:
+            chunk = json.loads(event["chunk"]["bytes"])
+            if chunk.get("type") == "content_block_delta":
+                delta = chunk.get("delta", {})
+                if delta.get("type") == "text_delta":
+                    yield f"data: {json.dumps({'text': delta['text']})}\n\n"
         yield "data: [DONE]\n\n"
 
     return Response(stream_with_context(generate()), mimetype="text/event-stream")
