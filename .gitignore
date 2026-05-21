@@ -1,5 +1,8 @@
 .env
 data/knowledge_base.json
+data/Alarms.xlsx
+data/feedback.jsonl
+data/*.jsonl
 __pycache__/
 *.pyc
 .DS_Store

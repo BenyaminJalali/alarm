@@ -6,7 +6,7 @@ AI troubleshooting agent for Generac Home Energy R2 platform. Live at alarm.dash
 ## Stack
 - Flask + AWS Bedrock (boto3) — Claude Sonnet 4.6 via `us.anthropic.claude-sonnet-4-6`
 - SSE streaming responses
-- Docker on Lightsail 3.143.89.105 (port 8083)
+- Docker on Lightsail (port 8083) — server details in `.env` on server only
 - Nginx reverse proxy with `proxy_buffering off` for SSE
 - GitHub Actions auto-deploys on every push to master
 
@@ -31,10 +31,6 @@ AI troubleshooting agent for Generac Home Energy R2 platform. Live at alarm.dash
 - Root keys have been replaced with scoped keys on the server
 - `.env` on server at `/home/ubuntu/alarm/.env` — never committed to git
 - GitHub token — stored in `.env` on server only, SAML-authorized for Generac enterprise
-
-## SSH Access
-- Key: `C:\Users\BJalali\.ssh\LightsailDefaultKey-us-east-2.pem`
-- Host: `ubuntu@3.143.89.105`
 
 ## Three Audience Tiers
 - Homeowner — plain English, no jargon, 3-5 sentences
