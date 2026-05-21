@@ -569,5 +569,115 @@
         "internal_notes": "Figure 2-4 (021150): system topology diagram. Figure 4-11 (021189): disconnect tool diagram. Disconnect Tool part number: APKE00102. PWRmicro is compatible with 60-cell, 66-cell, and 72-cell modules including half-cut cell variants. For single-module connections, cap the unused DC port with DC Male Connector Cap APKE00100."
       }
     }
+  ,
+    {
+      "id": "procedure.bmu.module_installation_order",
+      "alarm_name": "Battery Module Installation Order and Retention Clips",
+      "device": "BMU",
+      "friendly_name": "Battery Module Loading Sequence (M3/M4/M5/M6)",
+      "alarm_type": "installation_procedure",
+      "sources": ["battery_a0008210367_installmanual_pages26-29_screenshots"],
+      "engineering": {
+        "description": "Battery module installation order for all configurations (M3, M4, M5, M6). Always install rear modules first, then front modules. M3 and M5 require a module spacer (odd number configurations).",
+        "troubleshooting": [
+          "Always install rear modules first regardless of configuration, then front modules.",
+          "Module installation order by config: M3 = positions 1,2,3 rear + spacer in front slot. M4 = positions 1,2,3,4. M5 = positions 1,2,3,4,5 + spacer. M6 = positions 1,2,3,4,5,6 (full cabinet).",
+          "Installing rear modules: angle top of module (B) under and behind the bracket lip (C). Slide bottom to back of enclosure (E). Verify module rests against grounding clips (F) — factory installed, must make contact.",
+          "Grounding tabs: install two L-shaped grounding tabs (A) at bottom of module on both sides. Fasten with M4x8mm star bit T20 screw at 13 in-lbs (1.47 Nm). Repeat at top.",
+          "Module spacer (M3 and M5 only): angle top of spacer (L) under bracket lip (M). Slide up between brackets, push bottom toward enclosure. Secure with two M4x8mm T20 screws at 13 in-lbs (1.47 Nm).",
+          "Retention clips (all front modules): three types — P (double clip, between rows), Q (single O clip, top and bottom of stack), R (single X clip, top and bottom). Align clip holes with stud (T) and mounting hole (U). Apply gentle pressure to verify grounding tabs and clips contact battery modules. Secure with M4x8mm T20 screw at 13 in-lbs (1.47 Nm).",
+          "Battery module ports on each module: A=Status LED, B=SOC LED, C=COMM In Port, D=COMM Out Port, E=Battery Power Port."
+        ],
+        "internal_notes": "Figure 4-11 (020993): module installation order diagrams for M3/M4/M5/M6. Grounding clips (F) are factory-installed on enclosure — they bite into battery module to provide equipment grounding. Spacer required ONLY for M3 and M5 (odd number). Retention clip types: P=double (between rows), Q=single marked O (top/bottom), R=single marked X (top/bottom). All fasteners M4x8mm star bit T20, 13 in-lbs."
+      }
+    },
+    {
+      "id": "specification.bmu.wiring_diagram",
+      "alarm_name": "PWRcell 2 Battery BMU Wiring Diagram",
+      "device": "BMU",
+      "friendly_name": "Battery Management Unit Wiring — All Connection Points",
+      "alarm_type": "specification",
+      "sources": ["battery_a0008210367_installmanual_page31_screenshot"],
+      "engineering": {
+        "description": "PWRcell 2 Battery BMU wiring diagram (Figure 5-1) showing all connection points. Wire terminal specifications from Table 5-1. DC color convention: red=positive, black=negative, green=ground.",
+        "troubleshooting": [
+          "A — Status LED / Battery Disconnect Switch (factory installed). This is the disconnect switch on the right side of the battery cabinet.",
+          "B — Module Comms (RJ45). Internal module communication port — NOT the CAN bus to other devices.",
+          "C — Control Circuit Terminals (24V+, GND, CTRL+, CTRL-). This IS the CAN bus connection to the inverter.",
+          "D — DC Power Terminals (DC+, DC-). High voltage DC connection to inverter BAT+/-.",
+          "E — Module Stack Power Cable (factory installed). Do not disconnect.",
+          "F — Ground Bar. Equipment grounding conductor from battery to inverter ground bar.",
+          "G — Not Used (reserved for legacy product). Leave empty.",
+          "DC wiring: route #6 AWG THHN or THWN-2 from DC Power Terminals (D) to inverter BAT+/- terminals.",
+          "Ferrite cores required if non-metallic conduit: install one ferrite on control circuit cable (C) and one on DC power cable (D). Part Number APKE00118, 6 qty required."
+        ],
+        "internal_notes": "Figure 5-1 (021006): BMU wiring side view. IMPORTANT: Port B (Module Comms) uses RJ45 connectors for INTERNAL module-to-module communication WITHIN the battery cabinet — this is NOT the same as the CAN bus. The CAN bus (between battery, inverter, SDS) uses the Control Circuit Terminals at port C. Ferrite core part: APKE00118, 6 per installation. DC convention: red=positive, black=negative, green=ground per NEC 210.5(C)(2) and 215.12(C)(2)."
+      }
+    },
+    {
+      "id": "specification.bmu.wire_terminal_specs",
+      "alarm_name": "PWRcell 2 Battery Wire Terminal Specifications",
+      "device": "BMU",
+      "friendly_name": "Battery Wiring — AWG, Torque, and Strip Length",
+      "alarm_type": "specification",
+      "sources": ["battery_a0008210367_installmanual_page32_screenshot"],
+      "engineering": {
+        "description": "PWRcell 2 Battery wire terminal specifications (Table 5-1). All conductors must be copper, rated 600V, sized per NEC Article 310, minimum 194°F (90°C) temperature rating.",
+        "threshold": "DC Power terminals: 4-6 AWG, no torque spec (hand tight), strip 3/8 in (10mm), 194°F (90°C) rated. Ground Bar: 4-6 AWG, 8 AWG, or 10 AWG, torque 45 in-lb (5 Nm), strip 3/8 in (10mm). Control Circuit terminals: 18 AWG, no torque spec, strip 3/8 in (10mm).",
+        "troubleshooting": [
+          "DC Power (4-6 AWG): strip 3/8 in, no torque spec — hand tight. Use copper only, 600V rated, 194°F minimum.",
+          "Ground Bar (4-6 AWG, 8 AWG, or 10 AWG): torque to 45 in-lb (5 Nm), strip 3/8 in.",
+          "Control Circuit (18 AWG, 4-conductor): strip 3/8 in. Wire colors: red = 24V+, black = GND, orange = CTRL+, blue = CTRL-.",
+          "CAN bus control circuit: max length 262.5 ft (80m) total across all devices (SDS to inverter to battery). Class 1 circuit.",
+          "Control circuit wiring sequence: Terminate red 24V+, black GND, orange CTRL+, blue CTRL- at SDS. Route to inverter terminal set A. Route second cable from inverter terminal set B to battery terminal set (maintain same color pattern).",
+          "CAN bus terminating resistor: must be at BOTH ends of the bus. Cannot be moved — if terminating at different device, fully remove connector with resistor."
+        ],
+        "internal_notes": "Table 5-1 (page 32). Control circuit = CAN bus wiring. Wire color standard: red=24V+, black=GND, orange=CTRL+, blue=CTRL-. Figure 5-2 (021007): inverter control circuit terminal sets. Figure 5-3 (021009): battery control circuit terminal sets (port B has two sets, use both for daisy-chain). Battery terminals are labeled STATUS LED/DISCONNECT, PORT A, PORT B, 24V+, GND, CTRL-, CTRL."
+      }
+    },
+    {
+      "id": "procedure.bmu.module_comm_cables",
+      "alarm_name": "Battery Module COMM Cable Connections",
+      "device": "BMU",
+      "friendly_name": "Battery Internal Cat 5 COMM Cable Wiring",
+      "alarm_type": "installation_procedure",
+      "sources": ["battery_a0008210367_installmanual_page33_screenshot"],
+      "engineering": {
+        "description": "Internal battery module communication (COMM) cable connections using Cat 5 cables. These cables connect battery modules to each other INSIDE the battery cabinet. This is NOT the same as CAN bus — CAN bus connects the battery to the inverter and SDS externally.",
+        "trigger": "Missing or incorrectly routed COMM cables cause individual battery modules to show as offline or not communicating, even though the battery cabinet itself is powered and connected.",
+        "troubleshooting": [
+          "IMPORTANT: Battery module COMM cables use Cat 5 (RJ45) connectors INSIDE the cabinet only. This is internal module-to-module communication — do NOT confuse with CAN bus.",
+          "Cable types: A=Black Cat 5 jumper cables (module-to-module on same shelf). B=Gray Cat 5 (MOD COMM, from cabinet harness). C=Blue Cat 5. D=Orange Cat 5. E=Purple Cat 5 (MOD COMM).",
+          "Four multicolored Cat 5 cables are factory-installed in the battery cabinet and attached to the battery power cable harness in the right-hand wiring channel.",
+          "Three black Cat 5 jumper cables are shipped loose in the hardware kit.",
+          "Step 1 — Connect gray Cat 5 cable (G/B) to top-most back module COMM IN port.",
+          "Step 2 — Connect purple Cat 5 cable (K/E) to bottom-most front module COMM Out port. NOTE: for less than 6 modules, connect K to COMM Out of bottom-most battery module.",
+          "Step 3 — Connect blue Cat 5 cable (H/C) and orange Cat 5 cable (J/D) as shown in Figure 5-5.",
+          "Step 4 — Connect black jumper cables (F/A) between battery modules on the same shelf.",
+          "Step 5 — Verify connections create continuous circuit from gray cable through all modules using black jumpers, blue and orange cables, ending at purple cable.",
+          "When two modules are on the bottom shelf: install purple cable (K) in the front module."
+        ],
+        "internal_notes": "Figure 5-4 (021010): battery module connections and LEDs (A=Status LED, B=SOC LED, C=COMM In, D=COMM Out, E=Battery Power Port). Figure 5-5 (021011): COMM cable routing diagram. NEVER reach into or touch battery terminals — high voltage. The Cat 5 COMM cables carry only low-voltage module status and SOC data between modules — they are safe to handle when battery is de-energized."
+      }
+    }
+  ,
+    {
+      "id": "procedure.bmu.power_cables_and_cover",
+      "alarm_name": "Battery Module Power Cable Connections and Cover Installation",
+      "device": "BMU",
+      "friendly_name": "Battery Power Cable Wiring and Cabinet Cover",
+      "alarm_type": "installation_procedure",
+      "sources": ["battery_a0008210367_installmanual_page34_screenshot"],
+      "engineering": {
+        "description": "Procedure for connecting battery module power cables and installing the battery cabinet front cover. Power cables carry high voltage DC — never touch terminals with hands or tools.",
+        "troubleshooting": [
+          "Module power cable connections: remove gray rubber cap (M) from each module power port (L). Plug black power cable connectors (N) into the uncapped battery module port ports (L). Install a loop jumper (P) on each UNUSED power cable connector (Q) — unused connectors must always be capped with loop jumpers.",
+          "Cover installation: using built-in orange handles (A), lift cover and tilt slightly forward in front of battery cabinet. Verify all cables are tucked in and clear of cabinet frame. Rest top interior of cover on back flange and align sides. In a slow and controlled manner, let cover swing toward cabinet. Fasten the two cover side screws (B) to secure cover.",
+          "Cover removal: loosen the two cover side screws (B). Using built-in orange handles (A), lift cover and swing out.",
+          "DANGER: Never reach into or touch battery terminals with hands or tools — high voltage DC present. Always de-energize by turning off the Battery Disconnect Switch before any work inside the cabinet."
+        ],
+        "internal_notes": "Figure 5-6 (021012): remove rubber caps and connect power cable connectors. Figure 5-7 (021013): loop jumper on unused power connectors. Figure 5-8 (021014, 021015): cover installation. Loop jumpers MUST be installed on all unused power cable connectors — this is a safety requirement. Orange handles are built into the cover for lifting."
+      }
+    }
   ]
 }
