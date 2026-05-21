@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Alarm Agent</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0f1117;
+      color: #e2e8f0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    /* ── Header ────────────────────────────────────────────────── */
+    .header {
+      background: #1a1d27;
+      border-bottom: 1px solid #2a2d3a;
+      padding: 0 32px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .header-logo svg rect { fill: #E8500A; }
+
+    .header-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+
+    .header-badge {
+      background: #1e3a5f;
+      color: #4f8ef7;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      color: #64748b;
+      font-size: 0.85rem;
+    }
+
+    .logout-link {
+      color: #64748b;
+      text-decoration: none;
+      padding: 5px 12px;
+      border: 1px solid #2a2d3a;
+      border-radius: 6px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .logout-link:hover {
+      color: #e2e8f0;
+      border-color: #4f8ef7;
+    }
+
+    /* ── Main layout ───────────────────────────────────────────── */
+    .main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 24px 48px;
+    }
+
+    .section-title {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #64748b;
+      margin-bottom: 12px;
+    }
+
+    /* ── Cards ─────────────────────────────────────────────────── */
+    .card {
+      background: #1a1d27;
+      border: 1px solid #2a2d3a;
+      border-radius: 10px;
+      padding: 20px 24px;
+    }
+
+    /* ── Hero stats grid ────────────────────────────────────────── */
+    .stats-grid {
+      display: grid;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .stats-grid-4 { grid-template-columns: repeat(4, 1fr); }
+    .stats-grid-4-sm { grid-template-columns: repeat(4, 1fr); }
+
+    @media (max-width: 900px) {
+      .stats-grid-4, .stats-grid-4-sm { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 520px) {
+      .stats-grid-4, .stats-grid-4-sm { grid-template-columns: 1fr 1fr; }
+    }
+
+    .stat-card {
+      background: #1a1d27;
+      border: 1px solid #2a2d3a;
+      border-radius: 10px;
+      padding: 20px 22px;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: #64748b;
+      font-weight: 500;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #e2e8f0;
+      line-height: 1;
+    }
+
+    .stat-value.accent { color: #4f8ef7; }
+    .stat-value.green  { color: #22c55e; }
+    .stat-value.red    { color: #ef4444; }
+    .stat-value.muted  { font-size: 1.2rem; color: #94a3b8; }
+
+    .stat-sub {
+      font-size: 0.75rem;
+      color: #64748b;
+      margin-top: 4px;
+    }
+
+    /* ── Audience row ───────────────────────────────────────────── */
+    .audience-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 600px) {
+      .audience-row { grid-template-columns: 1fr; }
+    }
+
+    .audience-box {
+      background: #1a1d27;
+      border: 1px solid #2a2d3a;
+      border-radius: 10px;
+      padding: 16px 20px;
+      text-align: center;
+    }
+
+    .audience-box .aud-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #64748b;
+      margin-bottom: 6px;
+    }
+
+    .audience-box .aud-count {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #e2e8f0;
+      line-height: 1;
+    }
+
+    .audience-box .aud-pct {
+      font-size: 0.8rem;
+      color: #64748b;
+      margin-top: 3px;
+    }
+
+    .audience-box.installer .aud-count { color: #4f8ef7; }
+    .audience-box.support   .aud-count { color: #a78bfa; }
+    .audience-box.homeowner .aud-count { color: #22c55e; }
+
+    /* ── Feedback row ───────────────────────────────────────────── */
+    .feedback-row {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 600px) {
+      .feedback-row { grid-template-columns: 1fr 1fr; }
+      .feedback-row .satisfaction { grid-column: 1 / -1; }
+    }
+
+    .feedback-box {
+      background: #1a1d27;
+      border: 1px solid #2a2d3a;
+      border-radius: 10px;
+      padding: 20px 22px;
+      text-align: center;
+    }
+
+    .feedback-box .fb-icon {
+      font-size: 1.8rem;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .feedback-box .fb-count {
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .feedback-box.up   .fb-count { color: #22c55e; }
+    .feedback-box.down .fb-count { color: #ef4444; }
+
+    .feedback-box .fb-label {
+      font-size: 0.75rem;
+      color: #64748b;
+      margin-top: 4px;
+    }
+
+    .satisfaction .fb-count { color: #4f8ef7; font-size: 2.4rem; }
+
+    /* ── Bar chart ──────────────────────────────────────────────── */
+    .chart-section {
+      margin-bottom: 20px;
+    }
+
+    .bar-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      height: 120px;
+      padding: 0 4px;
+    }
+
+    .bar-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      height: 100%;
+    }
+
+    .bar {
+      width: 100%;
+      background: #4f8ef7;
+      border-radius: 3px 3px 0 0;
+      min-height: 2px;
+      transition: opacity 0.15s;
+      cursor: default;
+    }
+
+    .bar:hover { opacity: 0.75; }
+    .bar.zero  { background: #2a2d3a; min-height: 2px; height: 2px !important; }
+
+    .bar-date-label {
+      font-size: 0.6rem;
+      color: #64748b;
+      margin-top: 4px;
+      white-space: nowrap;
+    }
+
+    .chart-x-labels {
+      display: flex;
+      justify-content: space-between;
+      padding: 0 4px;
+      margin-top: 2px;
+    }
+
+    .chart-x-label {
+      font-size: 0.65rem;
+      color: #64748b;
+    }
+
+    /* ── KB health ──────────────────────────────────────────────── */
+    .kb-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+
+    @media (max-width: 600px) {
+      .kb-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    .kb-stat {
+      text-align: center;
+    }
+
+    .kb-stat .kb-val {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #e2e8f0;
+    }
+
+    .kb-stat .kb-lbl {
+      font-size: 0.7rem;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 2px;
+    }
+
+    .sources-list {
+      margin-top: 14px;
+      border-top: 1px solid #2a2d3a;
+      padding-top: 14px;
+    }
+
+    .sources-title {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #64748b;
+      margin-bottom: 8px;
+    }
+
+    .source-tag {
+      display: inline-block;
+      background: #12151f;
+      border: 1px solid #2a2d3a;
+      border-radius: 5px;
+      padding: 3px 10px;
+      font-size: 0.75rem;
+      color: #94a3b8;
+      margin: 3px 4px 3px 0;
+    }
+
+    .no-sources {
+      font-size: 0.8rem;
+      color: #64748b;
+      font-style: italic;
+    }
+
+    /* ── Footer ────────────────────────────────────────────────── */
+    .footer {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 0.75rem;
+      color: #64748b;
+      border-top: 1px solid #2a2d3a;
+      padding-top: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    .footer a {
+      color: #64748b;
+      text-decoration: none;
+    }
+
+    .footer a:hover { color: #e2e8f0; }
+
+    /* ── Spacing helpers ────────────────────────────────────────── */
+    .mb-5  { margin-bottom: 5px; }
+    .mb-12 { margin-bottom: 12px; }
+    .mb-20 { margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+
+<!-- ── Header ────────────────────────────────────────────────────── -->
+<header class="header">
+  <div class="header-left">
+    <div class="header-logo">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <rect width="28" height="28" rx="6" fill="#E8500A"/>
+        <path d="M7 14h14M14 7v14" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <span class="header-title">Alarm Agent</span>
+    <span class="header-badge">Admin</span>
+  </div>
+  <div class="header-right">
+    <span>{{ admin_user }}</span>
+    <a href="/admin/logout" class="logout-link">Logout</a>
+  </div>
+</header>
+
+<!-- ── Main ──────────────────────────────────────────────────────── -->
+<main class="main">
+
+  <!-- Hero stats -->
+  <div class="section-title mb-12">Conversations</div>
+  <div class="stats-grid stats-grid-4 mb-20">
+    <div class="stat-card">
+      <div class="stat-label">Total</div>
+      <div class="stat-value accent">{{ stats.total_convs }}</div>
+      <div class="stat-sub">all time</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Today</div>
+      <div class="stat-value">{{ stats.today_convs }}</div>
+      <div class="stat-sub">UTC day</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">This Week</div>
+      <div class="stat-value">{{ stats.week_convs }}</div>
+      <div class="stat-sub">last 7 days</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Unique Sessions</div>
+      <div class="stat-value">{{ stats.unique_sessions }}</div>
+      <div class="stat-sub">distinct browser sessions</div>
+    </div>
+  </div>
+
+  <!-- Secondary stats -->
+  <div class="stats-grid stats-grid-4 mb-20">
+    <div class="stat-card">
+      <div class="stat-label">Active Days</div>
+      <div class="stat-value muted">{{ stats.active_days }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Avg / Day (7d)</div>
+      <div class="stat-value muted">{{ stats.avg_7d }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Peak Hour</div>
+      <div class="stat-value muted" style="font-size:0.95rem; padding-top:6px;">{{ stats.peak_hour }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Feedback Rate</div>
+      <div class="stat-value muted">{{ stats.feedback_rate }}%</div>
+      <div class="stat-sub">{{ stats.total_feedback }} of {{ stats.total_convs }} rated</div>
+    </div>
+  </div>
+
+  <!-- Audience breakdown -->
+  <div class="section-title mb-12">Audience Breakdown</div>
+  <div class="audience-row mb-20">
+    {% set total = stats.total_convs if stats.total_convs > 0 else 1 %}
+    {% set inst  = stats.audience_counts.get('installer', 0) %}
+    {% set supp  = stats.audience_counts.get('support', 0) %}
+    {% set home  = stats.audience_counts.get('homeowner', 0) %}
+    <div class="audience-box installer">
+      <div class="aud-label">Installer / Dealer</div>
+      <div class="aud-count">{{ inst }}</div>
+      <div class="aud-pct">{{ "%.0f"|format(inst / total * 100) }}%</div>
+    </div>
+    <div class="audience-box support">
+      <div class="aud-label">Support / TSE</div>
+      <div class="aud-count">{{ supp }}</div>
+      <div class="aud-pct">{{ "%.0f"|format(supp / total * 100) }}%</div>
+    </div>
+    <div class="audience-box homeowner">
+      <div class="aud-label">Homeowner</div>
+      <div class="aud-count">{{ home }}</div>
+      <div class="aud-pct">{{ "%.0f"|format(home / total * 100) }}%</div>
+    </div>
+  </div>
+
+  <!-- Feedback -->
+  <div class="section-title mb-12">User Feedback</div>
+  <div class="feedback-row mb-20">
+    <div class="feedback-box up">
+      <div class="fb-icon">&#128077;</div>
+      <div class="fb-count">{{ stats.thumbs_up }}</div>
+      <div class="fb-label">Helpful</div>
+    </div>
+    <div class="feedback-box satisfaction">
+      <div class="fb-icon" style="font-size:1rem; color:#64748b; margin-bottom:4px;">SATISFACTION</div>
+      <div class="fb-count">{{ stats.satisfaction }}%</div>
+      <div class="fb-label">{{ stats.total_feedback }} responses total</div>
+    </div>
+    <div class="feedback-box down">
+      <div class="fb-icon">&#128078;</div>
+      <div class="fb-count">{{ stats.thumbs_down }}</div>
+      <div class="fb-label">Not helpful</div>
+    </div>
+  </div>
+
+  <!-- Bar chart -->
+  <div class="section-title mb-12">Last 30 Days</div>
+  <div class="card chart-section mb-20">
+    {% set max_count = namespace(val=1) %}
+    {% for d in stats.chart_data %}
+      {% if d.count > max_count.val %}{% set max_count.val = d.count %}{% endif %}
+    {% endfor %}
+
+    <div class="bar-chart" id="barChart">
+      {% for d in stats.chart_data %}
+        {% if d.count == 0 %}
+          <div class="bar-wrap">
+            <div class="bar zero" title="{{ d.date }}: 0"></div>
+          </div>
+        {% else %}
+          {% set pct = (d.count / max_count.val * 100)|int %}
+          <div class="bar-wrap">
+            <div class="bar" style="height: {{ pct }}%;" title="{{ d.date }}: {{ d.count }}"></div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <div class="chart-x-labels">
+      <span class="chart-x-label">{{ stats.chart_data[0].date[5:] if stats.chart_data }}</span>
+      <span class="chart-x-label">{{ stats.chart_data[14].date[5:] if stats.chart_data|length > 14 }}</span>
+      <span class="chart-x-label">{{ stats.chart_data[-1].date[5:] if stats.chart_data }}</span>
+    </div>
+  </div>
+
+  <!-- KB Health -->
+  <div class="section-title mb-12">Knowledge Base Health</div>
+  <div class="card mb-20">
+    <div class="kb-grid">
+      <div class="kb-stat">
+        <div class="kb-val">{{ stats.kb_entries }}</div>
+        <div class="kb-lbl">Alarm Entries</div>
+      </div>
+      <div class="kb-stat">
+        <div class="kb-val">{{ stats.resolved_count }}</div>
+        <div class="kb-lbl">Resolved Cases</div>
+      </div>
+      <div class="kb-stat">
+        <div class="kb-val">{{ stats.kb_sources | length }}</div>
+        <div class="kb-lbl">KB Sources</div>
+      </div>
+    </div>
+
+    {% if stats.kb_sources %}
+    <div class="sources-list">
+      <div class="sources-title">Sources</div>
+      {% for src in stats.kb_sources %}
+        <span class="source-tag">{{ src }}</span>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="sources-list">
+      <span class="no-sources">No sources listed in knowledge base.</span>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <span>As of {{ stats.as_of }}</span>
+    <span>&middot;</span>
+    <a href="/admin/logout">Logout</a>
+    <span>&middot;</span>
+    <a href="/">Back to app</a>
+  </div>
+
+</main>
+
+<script>
+  // Auto-refresh every 60 seconds
+  setTimeout(() => location.reload(), 60000);
+</script>
+</body>
+</html>

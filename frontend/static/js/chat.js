@@ -1,4 +1,11 @@
 (function () {
+  // Generate a stable session ID for this browser session
+  const SESSION_ID = sessionStorage.getItem('alarm_session_id') || (() => {
+    const id = 'sess_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+    sessionStorage.setItem('alarm_session_id', id);
+    return id;
+  })();
+
   const messagesEl = document.getElementById("messages");
   const inputEl = document.getElementById("userInput");
   const sendBtn = document.getElementById("sendBtn");
@@ -242,7 +249,7 @@
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: history, audience: currentRole }),
+        body: JSON.stringify({ messages: history, audience: currentRole, session_id: SESSION_ID }),
       });
 
       if (!res.ok) throw new Error(`HTTP ${res.status}`);

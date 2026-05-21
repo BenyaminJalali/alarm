@@ -1,9 +1,11 @@
 import os
 import json
 import datetime
+import secrets
 from pathlib import Path
-from flask import Flask, request, jsonify, render_template, Response, stream_with_context
+from flask import Flask, request, jsonify, render_template, render_template_string, Response, stream_with_context, session, redirect, url_for
 import boto3
+import requests as http_requests
 
 app = Flask(
     __name__,
@@ -16,6 +18,15 @@ BEDROCK_MODEL_ID = os.environ.get("BEDROCK_MODEL_ID", "us.anthropic.claude-sonne
 KB_PATH = Path(__file__).parent.parent / "data" / "knowledge_base.json"
 FEEDBACK_PATH = Path(__file__).parent.parent / "data" / "feedback.jsonl"
 RESOLVED_PATH = Path(__file__).parent.parent / "data" / "resolved_cases.jsonl"
+
+FLASK_SECRET_KEY = os.environ.get("FLASK_SECRET_KEY", secrets.token_hex(32))
+GITHUB_CLIENT_ID = os.environ.get("GITHUB_CLIENT_ID", "")
+GITHUB_CLIENT_SECRET = os.environ.get("GITHUB_CLIENT_SECRET", "")
+GITHUB_CALLBACK_URL = os.environ.get("GITHUB_CALLBACK_URL", "https://alarm.dash-ly.com/admin/callback")
+ADMIN_GITHUB_USER = os.environ.get("ADMIN_GITHUB_USER", "BenyaminJalali")
+CONVERSATIONS_PATH = Path(__file__).parent.parent / "data" / "conversations.jsonl"
+
+app.secret_key = FLASK_SECRET_KEY
 
 _knowledge_base: dict | None = None
 
@@ -256,6 +267,20 @@ def chat():
     if not messages:
         return jsonify({"error": "No messages provided"}), 400
 
+    # Log conversation (session_id from client, no message content stored)
+    session_id = data.get("session_id", "unknown")
+    conv_record = {
+        "ts": datetime.datetime.utcnow().isoformat(),
+        "session_id": session_id,
+        "audience": audience,
+        "msg_count": len(messages),
+    }
+    try:
+        with open(CONVERSATIONS_PATH, "a") as f:
+            f.write(json.dumps(conv_record) + "\n")
+    except Exception:
+        pass
+
     kb_context = build_context_block()
 
     # Get first user text message for RAG lookup
@@ -362,6 +387,307 @@ def health():
         "kb_sources": kb.get("sources", []),
         "resolved_cases": resolved_count,
     })
+
+
+# ── Admin stats ────────────────────────────────────────────────────────────────
+
+def compute_stats():
+    from collections import Counter
+
+    now = datetime.datetime.utcnow()
+    today = now.date()
+    week_ago = today - datetime.timedelta(days=7)
+
+    # Conversations
+    conversations = []
+    if CONVERSATIONS_PATH.exists():
+        with open(CONVERSATIONS_PATH) as f:
+            for line in f:
+                try:
+                    conversations.append(json.loads(line.strip()))
+                except Exception:
+                    pass
+
+    total_convs = len(conversations)
+    today_convs = sum(1 for c in conversations if c.get("ts", "")[:10] == str(today))
+    week_convs = sum(1 for c in conversations if c.get("ts", "")[:10] >= str(week_ago))
+    unique_sessions = len(set(
+        c.get("session_id", "") for c in conversations
+        if c.get("session_id", "") != "unknown"
+    ))
+
+    # Active days
+    active_days = len(set(c.get("ts", "")[:10] for c in conversations if c.get("ts", "")))
+
+    # Avg per day (last 7 days)
+    avg_7d = round(week_convs / 7, 1)
+
+    # Peak hour
+    hour_counts = Counter(
+        int(c.get("ts", "T00")[11:13]) for c in conversations if len(c.get("ts", "")) > 12
+    )
+    peak_hour = hour_counts.most_common(1)[0][0] if hour_counts else 0
+    peak_hour_str = f"{peak_hour:02d}:00 - {peak_hour + 1:02d}:00 UTC"
+
+    # Audience breakdown
+    audience_counts = Counter(c.get("audience", "installer") for c in conversations)
+
+    # Last 30 days bar chart data
+    days_30 = [(today - datetime.timedelta(days=i)).isoformat() for i in range(29, -1, -1)]
+    day_counts = Counter(c.get("ts", "")[:10] for c in conversations)
+    chart_data = [{"date": d, "count": day_counts.get(d, 0)} for d in days_30]
+
+    # Feedback
+    feedback_records = []
+    if FEEDBACK_PATH.exists():
+        with open(FEEDBACK_PATH) as f:
+            for line in f:
+                try:
+                    feedback_records.append(json.loads(line.strip()))
+                except Exception:
+                    pass
+    thumbs_up = sum(1 for fb in feedback_records if fb.get("rating") == "up")
+    thumbs_down = sum(1 for fb in feedback_records if fb.get("rating") == "down")
+    total_feedback = thumbs_up + thumbs_down
+    feedback_rate = round(total_feedback / max(total_convs, 1) * 100, 1)
+    satisfaction = round(thumbs_up / max(total_feedback, 1) * 100, 1)
+
+    # KB
+    kb = load_knowledge_base()
+    kb_entries = len(kb.get("entries", {}))
+    kb_sources = kb.get("sources", [])
+    resolved_count = 0
+    if RESOLVED_PATH.exists():
+        with open(RESOLVED_PATH) as f:
+            resolved_count = sum(1 for line in f if line.strip())
+
+    return {
+        "total_convs": total_convs,
+        "today_convs": today_convs,
+        "week_convs": week_convs,
+        "unique_sessions": unique_sessions,
+        "active_days": active_days,
+        "avg_7d": avg_7d,
+        "peak_hour": peak_hour_str,
+        "audience_counts": dict(audience_counts),
+        "chart_data": chart_data,
+        "thumbs_up": thumbs_up,
+        "thumbs_down": thumbs_down,
+        "total_feedback": total_feedback,
+        "feedback_rate": feedback_rate,
+        "satisfaction": satisfaction,
+        "kb_entries": kb_entries,
+        "kb_sources": kb_sources,
+        "resolved_count": resolved_count,
+        "as_of": now.strftime("%Y-%m-%d %H:%M UTC"),
+    }
+
+
+# ── Admin routes ───────────────────────────────────────────────────────────────
+
+@app.route("/admin")
+def admin():
+    admin_user = session.get("admin_user")
+    if admin_user != ADMIN_GITHUB_USER:
+        return redirect(url_for("admin_login"))
+    stats = compute_stats()
+    return render_template("admin.html", stats=stats, admin_user=admin_user)
+
+
+@app.route("/admin/login")
+def admin_login():
+    if not GITHUB_CLIENT_ID:
+        return render_template_string("""
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Login</title>
+  <style>
+    body { background: #0f1117; color: #e2e8f0; font-family: system-ui, sans-serif;
+           display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+    .card { background: #1a1d27; border-radius: 12px; padding: 40px 48px; text-align: center; }
+    h2 { margin: 0 0 12px; font-size: 1.4rem; }
+    p { color: #64748b; margin: 0; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Admin Login Unavailable</h2>
+    <p>GitHub OAuth is not configured. Set GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET.</p>
+  </div>
+</body>
+</html>
+""")
+
+    state = secrets.token_hex(16)
+    session["oauth_state"] = state
+    params = {
+        "client_id": GITHUB_CLIENT_ID,
+        "redirect_uri": GITHUB_CALLBACK_URL,
+        "scope": "read:user",
+        "state": state,
+    }
+    from urllib.parse import urlencode
+    github_url = "https://github.com/login/oauth/authorize?" + urlencode(params)
+
+    return render_template_string("""
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Login — Alarm Agent</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      background: #0f1117;
+      color: #e2e8f0;
+      font-family: system-ui, -apple-system, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .card {
+      background: #1a1d27;
+      border-radius: 12px;
+      padding: 48px 56px;
+      text-align: center;
+      border: 1px solid #2a2d3a;
+      max-width: 380px;
+      width: 100%;
+    }
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+    .logo svg rect { fill: #E8500A; }
+    .logo-text { font-size: 1.1rem; font-weight: 600; color: #e2e8f0; }
+    h2 { margin: 0 0 8px; font-size: 1.3rem; font-weight: 600; }
+    p { color: #64748b; margin: 0 0 28px; font-size: 0.9rem; }
+    .gh-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: #4f8ef7;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 24px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+    .gh-btn:hover { background: #3a7ae0; }
+    .gh-btn svg { flex-shrink: 0; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">
+      <svg width="32" height="32" viewBox="0 0 28 28" fill="none">
+        <rect width="28" height="28" rx="6" fill="#E8500A"/>
+        <path d="M7 14h14M14 7v14" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      <span class="logo-text">Alarm Agent</span>
+    </div>
+    <h2>Admin Access</h2>
+    <p>Sign in with your GitHub account to continue.</p>
+    <a href="{{ github_url }}" class="gh-btn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.1 3.29 9.41 7.86 10.94.57.1.78-.25.78-.55
+                 0-.27-.01-1.17-.01-2.13-3.19.69-3.86-1.37-3.86-1.37-.52-1.32-1.27-1.67-1.27-1.67
+                 -1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.24 3.33.95
+                 .1-.74.4-1.24.72-1.53-2.55-.29-5.23-1.27-5.23-5.67 0-1.25.45-2.27 1.18-3.07
+                 -.12-.29-.51-1.46.11-3.04 0 0 .96-.31 3.15 1.18a10.96 10.96 0 012.87-.39c.97
+                 .01 1.95.13 2.87.39 2.18-1.49 3.14-1.18 3.14-1.18.63 1.58.24 2.75.12 3.04
+                 .74.8 1.18 1.82 1.18 3.07 0 4.41-2.69 5.38-5.25 5.66.41.36.78 1.06.78 2.13
+                 0 1.54-.01 2.78-.01 3.16 0 .3.2.66.79.55A11.51 11.51 0 0023.5 12C23.5 5.65
+                 18.35.5 12 .5z"/>
+      </svg>
+      Login with GitHub
+    </a>
+  </div>
+</body>
+</html>
+""", github_url=github_url)
+
+
+@app.route("/admin/callback")
+def admin_callback():
+    code = request.args.get("code")
+    state = request.args.get("state")
+
+    if not code or state != session.get("oauth_state"):
+        return "Invalid OAuth state.", 400
+
+    # Exchange code for access token
+    token_resp = http_requests.post(
+        "https://github.com/login/oauth/access_token",
+        json={
+            "client_id": GITHUB_CLIENT_ID,
+            "client_secret": GITHUB_CLIENT_SECRET,
+            "code": code,
+            "redirect_uri": GITHUB_CALLBACK_URL,
+        },
+        headers={"Accept": "application/json"},
+        timeout=10,
+    )
+    token_data = token_resp.json()
+    access_token = token_data.get("access_token")
+    if not access_token:
+        return "Failed to obtain access token.", 400
+
+    # Fetch GitHub username
+    user_resp = http_requests.get(
+        "https://api.github.com/user",
+        headers={
+            "Authorization": f"Bearer {access_token}",
+            "Accept": "application/json",
+        },
+        timeout=10,
+    )
+    github_user = user_resp.json().get("login", "")
+
+    if github_user != ADMIN_GITHUB_USER:
+        return render_template_string("""
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Access Denied</title>
+  <style>
+    body { background: #0f1117; color: #e2e8f0; font-family: system-ui, sans-serif;
+           display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+    .card { background: #1a1d27; border-radius: 12px; padding: 40px 48px; text-align: center;
+            border: 1px solid #2a2d3a; }
+    h2 { margin: 0 0 12px; color: #ef4444; }
+    p { color: #64748b; margin: 0; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Access Denied</h2>
+    <p>Your GitHub account is not authorized to access this admin panel.</p>
+  </div>
+</body>
+</html>
+"""), 403
+
+    session["admin_user"] = github_user
+    session.pop("oauth_state", None)
+    return redirect(url_for("admin"))
+
+
+@app.route("/admin/logout")
+def admin_logout():
+    session.clear()
+    return redirect(url_for("admin_login"))
 
 
 if __name__ == "__main__":
