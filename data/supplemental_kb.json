@@ -229,5 +229,139 @@
         "internal_notes": "Compatibility Calculator file: PWRmicro_PV_Module_Compatibility_Calculator_v1.0.xlsx — check for pre-validated modules. Vmp limit 42.5V, Isc limit 18A, Voc limit 70V all at STC. Do not use modules exceeding these limits even if they are 'close'."
       }
     }
+  ,
+    {
+      "id": "specification.pwrmicro.technical_specs",
+      "alarm_name": "PWRmicro Inverter Technical Specifications",
+      "device": "PWRmicro",
+      "friendly_name": "PWRmicro Electrical Specifications",
+      "alarm_type": "specification",
+      "sources": ["pwrmicro_installationmanual_english"],
+      "engineering": {
+        "description": "Full electrical specifications for the PWRmicro micro-inverter (model APKEPM820) at 240V and 208V single phase.",
+        "threshold": "Max DC Input Voltage: 70V. MPPT Voltage Range: 31-42.5V DC. Max Module Isc: 18A. DC Short Circuit Current Rating: 21A. Max Continuous Output: 3.42A (240V) / 3.94A (208V). Max Overcurrent Protection Per Circuit: 30A. Max PWRmicros per 30A circuit: 7 (240V) / 6 (208V). CEC Weighted Efficiency: 97%. Peak Inverter Efficiency: 97.3% (240V). Nighttime Power Consumption: 400mW. Weight: 8 lb (3.63 kg). Warranty: 25 years.",
+        "internal_notes": "Communication: Mesh Networked Power Line (Spread Spectrum Carrier) — NOT CAN bus. Ground Fault Protection: 2000V rms (transformer isolated). Ambient temp: -40 to 149°F (-40 to 65°C). Enclosure: Type 6. Certifications: UL1741, UL1741-SA, UL1741-SB, IEEE1547:2018, IEEE2030.5 CSIP, CA Rule 21, Rule 14H."
+      }
+    },
+    {
+      "id": "specification.sds.technical_specs",
+      "alarm_name": "Smart Disconnect Switch (SDS) Technical Specifications",
+      "device": "SDS",
+      "friendly_name": "SDS Electrical Specifications",
+      "alarm_type": "specification",
+      "sources": ["sds_a0008210373_installmanual"],
+      "engineering": {
+        "description": "Full electrical specifications for the PWRcell 2 Smart Disconnect Switch (SDS), part number APKE00067.",
+        "threshold": "AC Voltage: 120/240V. Grid Type: Single Phase. Current Rating: 200A. Short Circuit Current Rating: 22kA. Automatic Transfer Time: <50ms. System Control Method: 24V CAN. Maximum Backup Loads Panel: 200A. Maximum Non-Backup Loads Panel: 100A. AC PV input: 100A. ESS1 Breaker: 60A. Generator: up to 26kW. Dimensions: 17 x 7.1 x 36.4 in. Weight: 59 lb (26.76 kg). Operating Temp: -4 to 122°F (-20 to 50°C). Max Elevation: 6,561 ft (2,000m). Warranty: 10 years.",
+        "troubleshooting": [
+          "Control method is 24V CAN bus — maximum control circuit length is 262.5 ft (80m) total across all devices (SDS to Inverter to Battery).",
+          "Control cable: 600V-rated #18 AWG shielded 4-conductor. Wires: blue CNTRL-, orange CNTRL+, black GND, red 24V+.",
+          "CAN bus terminating resistor: must be present at BOTH ends of the CAN bus. SDS ships with one installed — do not move it. If terminating at a different device, fully remove the connector with the installed resistor.",
+          "Compatible main breakers (Eaton only): 100A=CSR2100N, 125A=CSR2125N, 150A=CSR2150N, 175A=CSR2175N, 200A=CSR2200N.",
+          "ESS breaker: Eaton BR260 (60A 2-pole).",
+          "AC PV breakers: Eaton BR220-BR2100 (20A-100A range).",
+          "Torque — Utility L1/L2 lug kit (250kcmil-2AWG): 375 in-lb. Backup Loads L1/L2 (2-6AWG): 275 in-lb. Neutral Lugs (300kcmil-6AWG): 275 in-lb. Lug kit/main breaker/bonding strap: 48 in-lb.",
+          "Bonding strap: MUST be installed if SDS is service entrance equipment. Do NOT install if SDS is fed from a feeder breaker.",
+          "Rapid Shutdown: AC PV breaker turned OFF and front cover locked satisfies NEC 690.12 rapid shutdown if SDS is outdoors near service entrance.",
+          "ESS Emergency Shutdown: Turn ESS1 breaker OFF and lock front cover, then turn off Battery Disconnect Switch on battery cabinet."
+        ],
+        "internal_notes": "SDS = Smart Disconnect Switch = MANTA in firmware. It is a microgrid interconnection device (MID) with power control system (PCS). Supports: 1x PWRcell 2 ESS, AC-coupled PV (Enphase IQ7/IQ8 only for 3rd party), Generac generator up to 26kW. Can be installed as service entrance equipment OR downstream of main panel. Clearances: min 77 in workspace height, min 32.75 in from grade to SDS, min 69.25 in mounting height for battery cabinet."
+      }
+    },
+    {
+      "id": "procedure.sds.commissioning",
+      "alarm_name": "PWRcell 2 System Commissioning Steps",
+      "device": "R2 System",
+      "friendly_name": "Pre-Commissioning and Field Pro App Steps",
+      "alarm_type": "installation_procedure",
+      "sources": ["sds_a0008210373_installmanual"],
+      "engineering": {
+        "description": "Pre-commissioning steps for PWRcell 2 system using the Generac Field Pro app. Must be completed in order before commissioning.",
+        "troubleshooting": [
+          "Step 1 — Download the Field Pro app from the app store.",
+          "Step 2 — Verify all connections are correctly tightened and perform tug tests on all wiring.",
+          "Step 3 — Check isolation resistance of each AC and DC circuit.",
+          "Step 4 — Verify polarity of DC wiring and phasing of AC wiring is correct.",
+          "Step 5 — Verify AC voltage before turning on power to SDS.",
+          "Step 6 — Turn ON the main breaker in SDS (if present) or the feeder breaker feeding SDS.",
+          "Step 7 — Turn ON the ESS1 breaker in SDS.",
+          "Step 8 — Turn ON the BATTERY DISCONNECT switch on right side of battery cabinet.",
+          "Step 9 — Sign into Field Pro app and follow commissioning instructions for PWRcell 2 system.",
+          "Step 10 — Configure Grid Settings: tap Grid Profile, select Recommended profile for the site address, configure Site Export Limit (0-50 kW) if required by utility interconnection agreement.",
+          "Step 11 — Configure PCS (Power Control System) settings as required."
+        ],
+        "internal_notes": "Field Pro app is required for commissioning — cannot commission without it. Grid profile is auto-suggested based on site address. Site export limit: 0-50 kW range. Only qualified persons per NEC may perform commissioning steps. If system won't commission, verify CAN bus termination at both ends first."
+      }
+    },
+    {
+      "id": "procedure.pwrmicro.led_status",
+      "alarm_name": "PWRmicro Status LED Patterns",
+      "device": "PWRmicro",
+      "friendly_name": "Micro-Inverter LED Blink Codes",
+      "alarm_type": "specification",
+      "sources": ["pwrmicro_installationmanual_english"],
+      "engineering": {
+        "description": "PWRmicro inverter LED blink patterns and their meaning. Green LED is on the right side of the unit and is visible after PV modules are connected and exposed to sunlight.",
+        "troubleshooting": [
+          "Continuous blinking — DC connected but AC is open. If still continuous after AC is applied, internal fuses may be open. Contact Generac Clean Energy Technical Support.",
+          "1 blink every 16 seconds — Normal operation, inverter is bound to Smart Combiner.",
+          "1 blink every 8 seconds — Normal operation, inverter NOT yet bound to Smart Combiner.",
+          "2 blinks every 4 seconds — Inverter phase-locked to grid, no export, no errors.",
+          "3 blinks every 4 seconds — Inverter phase-locked to grid, Smart Combiner is in reset.",
+          "4 blinks every 4 seconds — ERROR: grid voltage out of range.",
+          "5 blinks every 4 seconds — ERROR: DC voltage out of range.",
+          "8 blinks every 4 seconds — ERROR: harmonic distortion."
+        ],
+        "internal_notes": "LED is green. Visible after PV modules connected and in sunlight. 'Not bound to Smart Combiner' (1 blink/8s) is normal during initial installation before commissioning. If seeing 4 blinks (grid voltage error), check utility voltage with DMM before assuming inverter fault. If seeing 5 blinks (DC voltage error), check PV module Voc against 70V max limit."
+      }
+    },
+    {
+      "id": "specification.pwrmicro.smart_combiner_specs",
+      "alarm_name": "PWRmicro Smart Combiner Specifications",
+      "device": "PWRmicro",
+      "friendly_name": "Smart Combiner Electrical and Physical Specs",
+      "alarm_type": "specification",
+      "sources": ["pwrmicro_installationmanual_english"],
+      "engineering": {
+        "description": "Full specifications for the PWRmicro Smart Combiner, the central AC aggregation and communications hub for all PWRmicro circuits.",
+        "threshold": "Nominal Voltage: 120/240V or 120/208V single phase. Busbar Rating: 125A. Max PV Output Current: 100A. Number of AC PV Circuits (2-pole): 5. Max PWRmicros: 28 at 240VAC (24 at 208VAC). Circuit Breaker: Eaton 2-pole Type BR only. Production CT: 200A revenue grade (+/-0.5%). Internet: Wi-Fi or Ethernet. Cellular: LTE (for remote support and firmware updates only). Ambient temp: -40 to 131°F (-40 to 55°C). Enclosure: Type 3R. Weight: 29 lb (13.15 kg). Warranty: 10 years.",
+        "troubleshooting": [
+          "Only Eaton type BR breakers up to 30A may be installed in the Smart Combiner for AC PV circuits.",
+          "Breaker sizing by number of PWRmicros: 1-3 units = 15A (BR215). 4 units = 20A (BR220). 5 units = 25A (BR225). 6-7 units = 30A (BR230).",
+          "Do NOT remove or relocate the 15A breaker for the Smart Combiner Gateway and Control Board.",
+          "Torque for utility L1/L2 connection: 50 in-lb. Neutral lug (6-2/0 AWG): 120 in-lb, (8 AWG): 40 in-lb, (10-14 AWG): 35 in-lb.",
+          "External CTs (200A, revenue grade) are included in the box — Generac recommends installing them in every PWRmicro system.",
+          "Min install height: 36 in (91 cm) from grade. Min clearance: 0.5 in top and bottom of each PWRmicro, 3 in sides.",
+          "Smart Combiner uses PLC (Power Line Communication) to communicate with PWRmicro inverters — NOT CAN bus."
+        ],
+        "internal_notes": "Smart Combiner part number: APKEAC100. Control board has a 15A breaker — never remove. Gateway/control board has a separate 15A circuit. Up to 5 separate AC PV circuits (5 x 2-pole breakers). Cellular is built-in for remote support only, not primary monitoring. Wi-Fi reset button is inside wiring compartment."
+      }
+    },
+    {
+      "id": "specification.sds.wiring_compartment",
+      "alarm_name": "SDS Wiring Compartment Layout",
+      "device": "SDS",
+      "friendly_name": "Smart Disconnect Switch Wiring Connections",
+      "alarm_type": "specification",
+      "sources": ["sds_a0008210373_installmanual"],
+      "engineering": {
+        "description": "Wiring compartment layout for the PWRcell 2 Smart Disconnect Switch — identifies all connection points and their purposes.",
+        "troubleshooting": [
+          "Utility Connection L1, L2 — main utility input (lug kit or Eaton main breaker).",
+          "Backup Loads Connection L1, L2 — output to backup loads subpanel (200A max).",
+          "AC PV Breaker — up to 100A, for AC-coupled solar (Enphase IQ7/IQ8 compatible).",
+          "ESS1 Breaker (60A, BR260) — PWRcell 2 battery storage system connection.",
+          "Non-Backup Loads L1, L2 — output to non-backup loads subpanel (100A rated bus).",
+          "Generator Connection L1, L2 — Generac generator up to 26kW.",
+          "Control Circuit Wiring Terminals — CAN bus connection to inverter and battery.",
+          "Remote Stop (E-Stop) Terminals — normally closed circuit; opening it shuts down entire system.",
+          "Wi-Fi Reset Button — inside wiring compartment.",
+          "Ground Bar — all equipment ground connections.",
+          "Neutral Lugs — shared between utility and backup loads.",
+          "L1 and L2 cross over internally inside Eaton main breakers — if using lug kit, L2 terminates left, L1 terminates right."
+        ],
+        "internal_notes": "Compatible AC PV (3rd party): Enphase IQ 7 and IQ 8 Microinverters ONLY. ESS2 input exists but not currently used. E-Stop circuit is normally closed — a break (open circuit) shuts everything down. Max control circuit distance: 262.5 ft (80m) SDS to Inverter to Battery combined."
+      }
+    }
   ]
 }
