@@ -19,6 +19,7 @@ from pathlib import Path
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
 OUT_PATH = Path(__file__).parent.parent / "data" / "knowledge_base.json"
 XLSX_PATH = Path(__file__).parent.parent / "data" / "Alarms.xlsx"
+SUPPLEMENTAL_PATH = Path(__file__).parent.parent / "data" / "supplemental_kb.json"
 
 # ── helpers ───────────────────────────────────────────────────────────────────
 
@@ -481,6 +482,20 @@ def build():
                 ev["sources"] = ["reef_headend"]
                 entry_map[key] = ev
     kb["sources"].append("reef_headend")
+
+    # 6. Load supplemental KB from manual/guide content
+    print("Loading supplemental knowledge base (manuals, QSGs, guides)...")
+    if SUPPLEMENTAL_PATH.exists():
+        with open(SUPPLEMENTAL_PATH) as f:
+            supp = json.load(f)
+        supp_entries = supp.get("entries", [])
+        for e in supp_entries:
+            key = e.get("id") or f"supplemental:{e.get('alarm_name','')}"
+            entry_map[key] = e
+        print(f"  {len(supp_entries)} supplemental entries loaded")
+        kb["sources"].append("supplemental_manuals")
+    else:
+        print("  supplemental_kb.json not found — skipping")
 
     kb["entries"] = list(entry_map.values())
     print(f"\nTotal entries: {len(kb['entries'])}")

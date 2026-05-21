@@ -1,0 +1,233 @@
+{
+  "version": "1.0",
+  "description": "Supplemental knowledge from Generac R2 installation manuals, QSGs, and design guides",
+  "entries": [
+    {
+      "id": "procedure.pwrmicro.design_checklist",
+      "alarm_name": "PWRmicro System Design Checklist",
+      "device": "PWRmicro",
+      "friendly_name": "Micro-Inverter Design Rules",
+      "alarm_type": "installation_procedure",
+      "sources": ["PWRmicro_DesignChecklist_v1.3"],
+      "engineering": {
+        "description": "13-step design checklist that must be completed before installing a PWRmicro system. Covers PV module compatibility, circuit sizing, cable sizing, and code compliance.",
+        "troubleshooting": [
+          "Step 1 — Verify PV module compatibility: Vmp (STC) must be less than 42.5V, Isc must be less than 18A, Voc must be less than 70V.",
+          "Step 2 — Verify PV module NOCT temperature coefficient is within spec.",
+          "Step 3 — Determine number of PWRmicros per AC circuit: max 7 per 30A circuit at 240V, max 6 per 30A circuit at 208V.",
+          "Step 4 — Max 28 PWRmicros per Smart Combiner (APKEAC100).",
+          "Step 5 — Size AC circuit: PWRmicro output is 3.42A at 240V (2.85A at 208V). Multiply by 1.25 NEC continuous load factor.",
+          "Step 6 — Verify AC cable sizing meets NEC 690.8 continuous load requirements.",
+          "Step 7 — Verify DC cable sizing: use voltage drop tables for AWG 8/10/12/14 at system voltage.",
+          "Step 8 — Confirm rapid shutdown compliance per NEC 690.12 — Smart Combiner provides module-level rapid shutdown.",
+          "Step 9 — Verify roof layout: portrait vs. landscape orientation, single-row vs. two-row, string length.",
+          "Step 10 — Verify ground fault protection is provided by the PWRmicro unit (built-in).",
+          "Step 11 — Confirm AC disconnect is within sight of the combiner per NEC 690.15.",
+          "Step 12 — Verify utility interconnection agreement and utility approval if required.",
+          "Step 13 — Complete design documentation and save to project folder before installation."
+        ],
+        "internal_notes": "Max 7 PWRmicros per 30A circuit (240V) or 6 per circuit (208V). Max 28 per Smart Combiner. PWRmicro output: 3.42A at 240V. Vmp STC limit: 42.5V. Isc limit: 18A. Voc limit: 70V."
+      }
+    },
+    {
+      "id": "specification.pwrmicro.circuit_sizing",
+      "alarm_name": "PWRmicro Circuit and Breaker Sizing",
+      "device": "PWRmicro",
+      "friendly_name": "Micro-Inverter AC Circuit Sizing Reference",
+      "alarm_type": "specification",
+      "sources": ["PWRmicro_DesignChecklist_v1.3", "PWRmicro_VoltageDrop_Reference_Tables_v1.1"],
+      "engineering": {
+        "description": "AC circuit sizing rules and voltage drop reference for PWRmicro micro-inverter systems at 240V and 208V.",
+        "trigger": "Installer must size circuits correctly to avoid nuisance breaker trips or code violations.",
+        "threshold": "240V system: max 7 PWRmicros per 30A circuit (3.42A each x 7 = 23.9A, x1.25 = 29.9A). 208V system: max 6 per 30A circuit (2.85A each x 6 = 17.1A, x1.25 = 21.4A). For 20A circuits: max 4 at 240V.",
+        "troubleshooting": [
+          "For 240V systems: 30A breaker supports up to 7 PWRmicros. 20A breaker supports up to 4 PWRmicros.",
+          "For 208V systems: 30A breaker supports up to 6 PWRmicros.",
+          "Voltage drop limits: keep voltage drop below 3% one-way on DC homerun cables.",
+          "AWG 14 wire: use for runs up to approximately 80 feet at 240V with 7 units.",
+          "AWG 12 wire: use for runs 80-130 feet at 240V with 7 units.",
+          "AWG 10 wire: use for runs 130-200 feet at 240V with 7 units.",
+          "AWG 8 wire: use for very long runs or large strings exceeding 200 feet.",
+          "Smart Combiner (APKEAC100) accepts up to 28 PWRmicros total across all circuits."
+        ],
+        "internal_notes": "Part numbers: Smart Combiner = APKEAC100. PWRmicro inverter = APKEPM820. PWRmicro output rated: 250W per unit at 240V, 3.42A."
+      }
+    },
+    {
+      "id": "specification.pwrmicro.parts_bom",
+      "alarm_name": "PWRmicro System Parts List (BOM)",
+      "device": "PWRmicro",
+      "friendly_name": "Micro-Inverter Bill of Materials",
+      "alarm_type": "specification",
+      "sources": ["PWRmicro_BOM_Template_v1"],
+      "engineering": {
+        "description": "Complete bill of materials for a PWRmicro micro-inverter system including part numbers for all major components, cables, and accessories.",
+        "internal_notes": "Key part numbers: APKEAC100 = Smart Combiner. APKEPM820 = PWRmicro inverter unit. DC trunk cable, DC branch cables (Y-connectors), AC combiner cables. Mounting hardware: rail system compatible with major rail brands. Rapid shutdown: integrated in Smart Combiner per NEC 690.12. Communication: Zigbee mesh between PWRmicro units and Smart Combiner — does NOT use CAN bus (CAN bus is for R2 battery/inverter/gateway only).",
+        "troubleshooting": [
+          "PWRmicro = APKEPM820 — one per PV module.",
+          "Smart Combiner = APKEAC100 — one per string up to 28 PWRmicros.",
+          "DC trunk cable — single cable running along the row connecting all PWRmicros.",
+          "DC branch cables — Y-connectors attaching each PWRmicro to the trunk.",
+          "AC output cable — from Smart Combiner to AC breaker panel or subpanel.",
+          "Mounting brackets — attach PWRmicro to rail between PV module and rail.",
+          "Grounding hardware — per NEC 690 and local AHJ requirements.",
+          "Communication gateway (if monitoring needed) — connects to home network, reports to Generac Fleet."
+        ]
+      }
+    },
+    {
+      "id": "procedure.sds.mounting",
+      "alarm_name": "Smart Disconnect Switch Mounting Procedure",
+      "device": "SDS",
+      "friendly_name": "SDS Cabinet Mounting (QSG)",
+      "alarm_type": "installation_procedure",
+      "sources": ["qsg_pwrcell2_mounting_sds"],
+      "engineering": {
+        "description": "7-step procedure for mounting the Smart Disconnect Switch (SDS/MANTA) cabinet on the wall. Must be done before wiring.",
+        "troubleshooting": [
+          "Step 1 — Choose mounting location: flat wall, rated for outdoor use, accessible for maintenance. Check clearance requirements.",
+          "Step 2 — Mark the top line on the wall at 84.5 inches from the floor (top of bracket position).",
+          "Step 3 — Measure bracket position from the top line and mark drill points.",
+          "Step 4 — Pre-drill pilot holes for the mounting bracket using appropriate bit for wall material (concrete, stud, etc.).",
+          "Step 5 — Punch conduit knockout in the cabinet bottom for conduit entry.",
+          "Step 6 — Hang the cabinet on the bracket.",
+          "Step 7 — Fasten cabinet securely to wall with all provided hardware. Verify level."
+        ],
+        "internal_notes": "Top line at 84.5 inches from floor. Must be grounded per NEC 250. Conduit entry from bottom. De-energize all circuits before any wiring work."
+      }
+    },
+    {
+      "id": "procedure.bmu.mounting",
+      "alarm_name": "Battery Cabinet Mounting Procedure",
+      "device": "BMU",
+      "friendly_name": "Battery Cabinet Mounting (QSG)",
+      "alarm_type": "installation_procedure",
+      "sources": ["qsg_pwrcell2_mounting_battery"],
+      "engineering": {
+        "description": "8-step procedure for mounting the R2 Battery (BMU) cabinet on the wall. Battery modules must be removed before mounting, then reloaded back-first.",
+        "troubleshooting": [
+          "Step 1 — Remove all battery modules from the cabinet before mounting (reduces weight significantly).",
+          "Step 2 — Choose mounting location: flat wall, rated for outdoor/indoor use per nameplate, adequate clearance on all sides.",
+          "Step 3 — Mark the top bracket line on the wall.",
+          "Step 4 — Pre-drill pilot holes for mounting bracket.",
+          "Step 5 — Punch conduit knockout for wiring entry.",
+          "Step 6 — Hang the empty cabinet on the wall bracket.",
+          "Step 7 — Fasten all mounting hardware securely. Verify plumb and level.",
+          "Step 8 — Reload battery modules back-first (terminal end facing in). Ensure grounding clips engage on each module."
+        ],
+        "internal_notes": "Battery modules are heavy — always remove before mounting cabinet. Reload modules with terminal end facing inward (back-first). Grounding clips must engage on each module for proper grounding. DC wiring is high voltage — do not energize until all connections are verified. CAN bus communication cable connects battery to inverter."
+      }
+    },
+    {
+      "id": "procedure.inv.mounting",
+      "alarm_name": "Inverter Mounting Procedure",
+      "device": "INV",
+      "friendly_name": "Inverter Mounting (QSG)",
+      "alarm_type": "installation_procedure",
+      "sources": ["qsg_pwrcell2_mounting_inverter"],
+      "engineering": {
+        "description": "7-step procedure for mounting the R2 Inverter cabinet on the wall.",
+        "troubleshooting": [
+          "Step 1 — Choose mounting location: flat wall, adequate clearance on all sides for airflow and maintenance access.",
+          "Step 2 — Mark the top line on the wall. Inverter bracket is 1/2 inch from the top line.",
+          "Step 3 — Measure bracket position (1/2 inch from top line) and mark drill points.",
+          "Step 4 — Pre-drill pilot holes for mounting bracket.",
+          "Step 5 — Punch conduit knockouts for wiring entry.",
+          "Step 6 — Hang inverter on the wall bracket.",
+          "Step 7 — Fasten all mounting hardware securely. Verify level."
+        ],
+        "internal_notes": "Inverter bracket is 1/2 inch from the top line (differs from SDS at 84.5 inches). Adequate airflow clearance is required — do not mount in enclosed space without ventilation. CAN bus cable connects inverter to battery and gateway."
+      }
+    },
+    {
+      "id": "procedure.r2system.wiring",
+      "alarm_name": "R2 System Wiring Guide",
+      "device": "R2 System",
+      "friendly_name": "Complete System Wiring (Torque Specs, Control Wiring, Ferrite Kits)",
+      "alarm_type": "installation_procedure",
+      "sources": ["qsg_pwrcell2_wiring"],
+      "engineering": {
+        "description": "Complete wiring guide for R2 system including torque specifications, SDS breaker installation, control wiring, inverter wiring, and ferrite kit placement.",
+        "troubleshooting": [
+          "Utility lug torque — 250kcmil to 2 AWG: 375 lb-in. 2 AWG to 6 AWG: 275 lb-in. Follow torque specs exactly to prevent loose connections and arc faults.",
+          "SDS breaker installation — Install the SDS breaker in the load center. De-energize load center before work. Verify breaker rating matches system spec.",
+          "Control wiring — Low-voltage CAN bus cables connect all devices: SDS, Inverter, Battery, and Gateway. Use CAN bus cables only — do NOT substitute with ethernet/CAT5/RJ45.",
+          "CAN bus termination — Install termination resistors at each end of the CAN bus chain. Missing terminators cause communication timeout alarms.",
+          "Inverter AC wiring — Connect utility side and load side per wiring diagram. Install ferrite kits (APKE00118) on inverter AC cables as shown.",
+          "Ferrite kit placement — APKE00118 ferrite cores must be installed on AC output cables at the inverter. Incorrect placement causes EMI issues.",
+          "Battery DC wiring — High voltage DC cables connect battery to inverter. Do not handle while energized. Torque DC cable lugs per spec.",
+          "Battery right or left entry — Battery cabinet supports conduit entry from right or left side. Select based on site conduit routing.",
+          "Final check — Verify all CAN bus cable terminations are tight. Verify all torque specs met. Verify ferrite kits installed. Before energizing, confirm no tools or debris inside cabinets."
+        ],
+        "internal_notes": "Torque specs: Utility lugs 250kcmil-2AWG = 375 lb-in. 2-6 AWG = 275 lb-in. Ferrite kit P/N: APKE00118 — required on inverter AC cables. CAN bus cables: proprietary twisted pair, NOT RJ45/ethernet. Termination resistors required at each end of CAN bus. DC wiring is high voltage — always de-energize before inspection. Battery supports right or left conduit entry."
+      }
+    },
+    {
+      "id": "specification.r2system.can_bus",
+      "alarm_name": "R2 Platform CAN Bus Communication",
+      "device": "R2 System",
+      "friendly_name": "CAN Bus Wiring and Troubleshooting",
+      "alarm_type": "specification",
+      "sources": ["qsg_pwrcell2_wiring", "system_knowledge"],
+      "engineering": {
+        "description": "The R2 platform uses CAN bus cables for communication between all devices. CAN bus is NOT ethernet, NOT RJ45, NOT CAT5. Understanding CAN bus wiring is essential for diagnosing communication alarms.",
+        "trigger": "Communication alarms (timeout, offline, not responding) are often caused by CAN bus wiring issues: loose connections, missing terminators, wrong cable type, or damaged cable.",
+        "troubleshooting": [
+          "CAN bus cable type — Proprietary twisted-pair cable with Generac connectors. Never substitute with ethernet, CAT5, or RJ45 cable.",
+          "CAN bus topology — Daisy-chain: Gateway → Inverter → Battery → SDS (or similar chain). One cable between each pair of devices.",
+          "Termination resistors — Required at each END of the CAN bus chain. Each end device needs a termination resistor. Missing terminator = communication failures.",
+          "Check all connections — CAN bus connectors must be fully seated and locked. A partially connected cable is a common cause of intermittent communication faults.",
+          "Check cable routing — CAN bus cables should not run parallel to AC or DC power cables for long distances (induces noise). Cross at 90 degrees if crossing is required.",
+          "If one device shows offline — Check the CAN cable to that specific device first. Also check the terminator on that end.",
+          "If all devices show offline — Gateway may be the issue, or power cycle the full system."
+        ],
+        "internal_notes": "CAN bus = Controller Area Network. Runs at 250kbps on R2 platform. Termination = 120 ohm resistors at each end. Cable is a Generac-proprietary twisted pair — not interchangeable with ethernet. Common failure: partially inserted connector, damaged cable from pinching, or missing terminator when a device is added to the chain."
+      }
+    },
+    {
+      "id": "overview.pwrmicro.system_introduction",
+      "alarm_name": "PWRmicro System Overview",
+      "device": "PWRmicro",
+      "friendly_name": "PWRmicro Introduction and Key Architecture",
+      "alarm_type": "specification",
+      "sources": ["PWRmicro_Support_Resources_Introduction_Video"],
+      "engineering": {
+        "description": "PWRmicro is Generac's microinverter product line for rooftop solar. It uses a unique 2-to-1 architecture — one PWRmicro unit connects to two PV modules simultaneously. This differs from traditional microinverters that are 1-to-1. The Smart Combiner consolidates all circuits into one location.",
+        "trigger": "Installers new to PWRmicro often apply 1-to-1 microinverter rules (from Enphase or APsystems) incorrectly. PWRmicro is 2-to-1.",
+        "threshold": "Smart Combiner: max 28 PWRmicro units (= 56 PV modules), max 100A total. Circuits: up to 30A breakers, up to 50% more AC watts per circuit vs traditional 1-to-1 microinverters.",
+        "troubleshooting": [
+          "PWRmicro is 2-to-1: one microinverter unit handles two PV modules. If a unit shows zero output, check both connected modules.",
+          "Smart Combiner (APKEAC100): handles up to 28 PWRmicros (56 PV modules), up to 100A total.",
+          "Circuit design: supports 30A breakers per circuit — allowing up to 7 PWRmicros per circuit at 240V (see circuit sizing spec).",
+          "Communication: PWRmicro uses Power Line Communication (PLC) between microinverters and the Smart Combiner — NOT CAN bus (CAN bus is for R2 battery storage system only). Smart Combiner also has backup cellular, Wi-Fi, and Ethernet.",
+          "Training resources: ACPV 101 on Generac University (free, online, 1-2 hours). Design Guide, BOM Template, Design Checklist available as support tools.",
+          "Array shapes supported: portrait stackers, landscape arrays, single-module rows — all covered in Design Guide."
+        ],
+        "internal_notes": "PWRmicro is a SEPARATE product line from R2 battery storage. They can be installed together (complete energy solution) but are independent systems. PWRmicro uses PLC for device communication; R2 storage uses CAN bus. Lead: Isaac Opolinski, Field Applications team. Training course: ACPV 101 on Generac University."
+      }
+    },
+    {
+      "id": "specification.pwrmicro.pv_module_compatibility",
+      "alarm_name": "PWRmicro PV Module Compatibility Requirements",
+      "device": "PWRmicro",
+      "friendly_name": "PV Module Specs for PWRmicro Compatibility",
+      "alarm_type": "specification",
+      "sources": ["PWRmicro_DesignChecklist_v1.3"],
+      "engineering": {
+        "description": "PV module electrical specifications that must be met for compatibility with the PWRmicro micro-inverter. Non-compatible modules can cause alarms or damage.",
+        "threshold": "Vmp (STC): must be less than 42.5V. Isc (STC): must be less than 18A. Voc (STC): must be less than 70V. Check module datasheet under STC (Standard Test Conditions: 1000W/m2, 25C).",
+        "trigger": "If PV module specs exceed these limits, the PWRmicro will not operate correctly and may generate overcurrent or overvoltage alarms.",
+        "troubleshooting": [
+          "Step 1 — Obtain PV module datasheet and locate STC values for Vmp, Isc, and Voc.",
+          "Step 2 — Verify Vmp STC is below 42.5V. Most 60-cell and 72-cell modules meet this.",
+          "Step 3 — Verify Isc STC is below 18A. High-efficiency bifacial modules may approach this limit.",
+          "Step 4 — Verify Voc STC is below 70V.",
+          "Step 5 — Check NOCT (Nominal Operating Cell Temperature) temperature coefficient — verify within spec.",
+          "Step 6 — If module is borderline, check the PWRmicro PV Module Compatibility Calculator (APKEPM820) for confirmed compatibility.",
+          "Step 7 — Only use modules from the compatibility list for guaranteed performance."
+        ],
+        "internal_notes": "Compatibility Calculator file: PWRmicro_PV_Module_Compatibility_Calculator_v1.0.xlsx — check for pre-validated modules. Vmp limit 42.5V, Isc limit 18A, Voc limit 70V all at STC. Do not use modules exceeding these limits even if they are 'close'."
+      }
+    }
+  ]
+}
