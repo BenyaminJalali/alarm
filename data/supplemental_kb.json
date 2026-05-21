@@ -363,5 +363,27 @@
         "internal_notes": "Compatible AC PV (3rd party): Enphase IQ 7 and IQ 8 Microinverters ONLY. ESS2 input exists but not currently used. E-Stop circuit is normally closed — a break (open circuit) shuts everything down. Max control circuit distance: 262.5 ft (80m) SDS to Inverter to Battery combined."
       }
     }
+  ,
+    {
+      "id": "specification.pwrmicro.module_compatibility_calculator",
+      "alarm_name": "PWRmicro PV Module Compatibility Calculator",
+      "device": "PWRmicro",
+      "friendly_name": "JA Solar Module Compatibility List",
+      "alarm_type": "specification",
+      "sources": ["PWRmicro_PV_Module_Compatibility_Calculator_v1.0_2026.01.26.xlsx"],
+      "engineering": {
+        "description": "The PWRmicro compatibility calculator checks PV modules against PWRmicro thresholds. v1.0 (Jan 2026) pre-loads 308 JA Solar module models. Compatibility is determined by checking Isc, Voc, and Vmp against PWRmicro limits at low and high temperature extremes based on IECC climate zone.",
+        "threshold": "PWRmicro limits: Isc max 18A, Voc max 70V, Vmp low 24V, Vmp high 51V, MPPT voltage 31.699-42.5V (climate zones 1-3) or 32.499-42.5V (zones 4+). A module is SUPPORTED only if it passes ALL checks at both low and high temperature limits.",
+        "troubleshooting": [
+          "To check module compatibility: obtain module datasheet, enter Pmax, Isc STC, Voc STC, Vpmax STC, temperature coefficients (αIsc, βVoc), and IECC climate zone into calculator.",
+          "The most common failure mode is Voc too high at low temperatures — cold weather increases open-circuit voltage. Always check Voc at the lowest expected temperature for the site.",
+          "Isc limit is 18A — high-efficiency bifacial modules or modules with backside gain may approach this limit.",
+          "MPPT voltage range is 31.699-42.5V (IECC zones 1-3) or 32.499-42.5V (zones 4+). Modules with Vmp outside this range will not be harvested efficiently.",
+          "If a module is not in the calculator, manually check: Isc < 18A, Voc < 70V at the lowest expected temperature, Vmp within MPPT range.",
+          "JA Solar models pre-loaded in v1.0 calculator (308 models): JAM5-72, JAM6-60, JAM6-72, JAP6-60, JAP6-72, JAM60S, JAM72S, JAM72D, JAM54S, JAM54D, JAM78D, JAM78S, JAM66D series from 170W to 620W."
+        ],
+        "internal_notes": "Calculator file: PWRmicro_PV_Module_Compatibility_Calculator_v1.0_2026.01.26.xlsx. Contains 3 sheets: 'Module Compatibility Calculator' (input), 'Calculations' (308 JA Solar models), 'CEC 04-01-25' (full CEC module database with 21,000+ modules). The CEC sheet can theoretically be used to find specs for any CEC-listed module and manually verify compatibility. File is formula-based — requires Excel to run. Formulas cannot be evaluated by Python without Excel."
+      }
+    }
   ]
 }
