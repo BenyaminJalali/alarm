@@ -16,8 +16,14 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# Build knowledge base on container start if not already present
+# Store supplemental KB in image at a path not shadowed by the data volume
+RUN cp /app/data/supplemental_kb.json /app/supplemental_kb_image.json 2>/dev/null || true
+
+# On container start: sync supplemental KB into volume, then rebuild KB if needed
 CMD ["sh", "-c", "\
+  if [ -f /app/supplemental_kb_image.json ]; then \
+    cp /app/supplemental_kb_image.json /app/data/supplemental_kb.json; \
+  fi && \
   if [ ! -f /app/data/knowledge_base.json ]; then \
     echo 'Building knowledge base...' && \
     python /app/backend/build_knowledge_base.py; \
