@@ -9,6 +9,11 @@ services:
       - AWS_REGION=${AWS_REGION:-us-east-1}
       - BEDROCK_MODEL_ID=${BEDROCK_MODEL_ID:-us.anthropic.claude-sonnet-4-6}
       - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - FLASK_SECRET_KEY=${FLASK_SECRET_KEY}
+      - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
+      - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
+      - GITHUB_CALLBACK_URL=${GITHUB_CALLBACK_URL:-https://alarm.dash-ly.com/admin/callback}
+      - ADMIN_GITHUB_USER=${ADMIN_GITHUB_USER:-BenyaminJalali}
     volumes:
       - alarm_data:/app/data
     restart: unless-stopped
