@@ -385,5 +385,189 @@
         "internal_notes": "Calculator file: PWRmicro_PV_Module_Compatibility_Calculator_v1.0_2026.01.26.xlsx. Contains 3 sheets: 'Module Compatibility Calculator' (input), 'Calculations' (308 JA Solar models), 'CEC 04-01-25' (full CEC module database with 21,000+ modules). The CEC sheet can theoretically be used to find specs for any CEC-listed module and manually verify compatibility. File is formula-based — requires Excel to run. Formulas cannot be evaluated by Python without Excel."
       }
     }
+  ,
+    {
+      "id": "specification.bmu.system_overview",
+      "alarm_name": "PWRcell 2 System Overview and Model Naming",
+      "device": "BMU",
+      "friendly_name": "Battery System Topology and Model Names",
+      "alarm_type": "specification",
+      "sources": ["battery_a0008210367_installmanual_screenshots"],
+      "engineering": {
+        "description": "PWRcell 2 system topology and battery model naming convention. The system connects: PWRcell 2 Battery → PWRcell 2 Inverter → Smart Disconnect Switch → Backup Load Center → Meter Socket → Grid. Optional AC PV Combiner connects at the Smart Disconnect Switch. Optional Shutdown Switch connects at the bottom of the Smart Disconnect Switch.",
+        "internal_notes": "Model naming: PWRcell 2 M3 = 3 modules = 9 kWh usable. M4 = 4 modules = 12 kWh. M5 = 5 modules = 15 kWh. M6 = 6 modules = 18 kWh. The number after M = number of battery modules installed in the cabinet. Each module adds 3 kWh of usable energy. Maximum is M6 (6 modules, 18 kWh). Figure reference: 020942 (system diagram), 020943 (model naming).",
+        "troubleshooting": [
+          "If battery capacity seems wrong — check model number. M3=9kWh, M4=12kWh, M5=15kWh, M6=18kWh. Each module slot adds 3kWh.",
+          "System power flow: Battery connects to Inverter via DC wiring (high voltage). Inverter connects to Smart Disconnect Switch via AC. SDS connects to Backup Load Center and to grid via Meter.",
+          "AC PV (solar) connects at the Smart Disconnect Switch, not directly to the inverter or battery.",
+          "Optional Shutdown Switch (E-Stop) wires to the Smart Disconnect Switch control board — shutting it off kills the entire system."
+        ]
+      }
+    },
+    {
+      "id": "specification.bmu.clearances",
+      "alarm_name": "PWRcell 2 Battery Installation Clearances",
+      "device": "BMU",
+      "friendly_name": "Battery Cabinet Minimum Clearances",
+      "alarm_type": "specification",
+      "sources": ["battery_a0008210367_installmanual_screenshots"],
+      "engineering": {
+        "description": "Minimum installation clearances for PWRcell 2 battery cabinet, inverter, and SDS — both single-unit and multi-unit configurations. Must comply with NEC 110.26.",
+        "threshold": "Single unit (with inverter and SDS): left/right sides 8 in (20.3 cm), above cover 3 in (74 mm), below enclosure 1-5/8 in (41 mm), min enclosure height 71 in (180.3 cm), min working space height 6 ft 6 in (2.0 m), min working space width 7 ft 6-3/4 in (2.3 m). Inverter: 6 in above and below for passive cooling, 36 in min from grade. SDS: 32-3/4 in min from grade. Multiple batteries: 18 in between batteries (where UL 9540A test reports accepted), otherwise 36 in.",
+        "troubleshooting": [
+          "Inverter requires 6 inches above AND below for passive cooling airflow — do not block these gaps.",
+          "Minimum from grade: Inverter = 36 in (91 cm). SDS = 32-3/4 in (83 cm). Battery minimum height = 71 in (180 cm) for the cabinet.",
+          "Multiple battery cabinets: 18 in between them if UL 9540A separation accepted by local AHJ. Otherwise 36 in required.",
+          "Always maintain 8 in on left and right sides for all enclosures.",
+          "Minimum working space height is 6 ft 6 in — verify ceiling clearance at install site.",
+          "All clearances must comply with NEC Article 110.26 working space requirements."
+        ],
+        "internal_notes": "Figure 3-3 (020976): single-unit clearance diagram. Figure 3-4 (020977): multi-battery clearance diagram. 18 in battery separation only where UL 9540A test reports are accepted for reduced separation distances — otherwise 36 in is required by local code."
+      }
+    },
+    {
+      "id": "specification.bmu.module_dimensions",
+      "alarm_name": "PWRcell 2 Battery Module Physical Dimensions",
+      "device": "BMU",
+      "friendly_name": "Battery Module Size and Mounting Bracket Placement",
+      "alarm_type": "specification",
+      "sources": ["battery_a0008210367_installmanual_screenshots"],
+      "engineering": {
+        "description": "Physical dimensions of individual PWRcell 2 battery modules and mounting bracket placement measurements.",
+        "threshold": "Battery module dimensions: A (height) = 17.72 ± 0.08 in (450 ± 2 mm). B (depth) = 3.31 ± 0.08 in (84 ± 2 mm). C (width) = 17.32 ± 0.08 in (440 ± 2 mm). Mounting bracket: measure 17 in (43.18 cm) down from the top line to the top of the battery mounting bracket.",
+        "troubleshooting": [
+          "Mounting bracket placement: measure 17 in (43.18 cm) DOWN from the established top line to the top of the mounting bracket — mark this point for reference.",
+          "Use a level on the bracket to mark fastener holes accurately.",
+          "Pre-drill holes before fastening bracket.",
+          "Fasten bracket to studs or structural members — never to drywall alone.",
+          "Each battery module is approximately 17.72 in tall and 17.32 in wide — plan shelf spacing accordingly when loading modules into the cabinet."
+        ],
+        "internal_notes": "Figure 3-5 (011292): battery module dimensions diagram. Figure 4-3 (020984): measure from top line diagram. Figure 4-4 (020985): mark bracket holes. Figure 4-5 (020986): pre-drill holes. Battery module is square-ish — 17.72 H x 17.32 W x 3.31 D inches per module."
+      }
+    }
+  ,
+    {
+      "id": "specification.sds.wiring_compartment_diagram",
+      "alarm_name": "SDS Wiring Compartment Full Label Map",
+      "device": "SDS",
+      "friendly_name": "Smart Disconnect Switch Wiring Compartment — All Connection Points",
+      "alarm_type": "specification",
+      "sources": ["sds_a0008210373_installmanual_page21_screenshot"],
+      "engineering": {
+        "description": "Complete labeled diagram of the PWRcell 2 SDS wiring compartment (Figure 5-1). All connection points identified by letter. Reference this when an installer reports wiring in the wrong location or can't find where to connect a component.",
+        "troubleshooting": [
+          "A — Utility Connection L1, L2 (lug kit or Eaton main breaker). This is where grid power comes in.",
+          "B — Backup Loads Connection L1, L2. Output to backup loads subpanel — what stays on during an outage.",
+          "C — AC PV Breaker (up to 100A). Where solar (Enphase IQ7/IQ8) connects.",
+          "D — ESS 2 — Not Used at This Time. Leave empty.",
+          "E — ESS 1 Breaker (60A). Where the PWRcell 2 battery storage system connects.",
+          "F — Non-Backup Loads Connection L1, L2 (100A rated bus). Loads that go offline during an outage.",
+          "G — Generator Connection L1, L2. Generac generator input.",
+          "H — Control Circuit Wiring Terminals (CAN bus). Blue CNTRL-, orange CNTRL+, black GND, red 24V+.",
+          "J — Remote Stop Terminals (E-Stop). Normally closed circuit — opening this shuts down the entire system.",
+          "K — Wi-Fi Reset Button.",
+          "L — Gen Control Wiring Terminals.",
+          "M — Main Relay Manual Override.",
+          "N — Ground Bar. All equipment grounds terminate here.",
+          "P — Utility/Backup Loads Neutral Lugs (shared neutral).",
+          "Q — Neutral Terminals."
+        ],
+        "internal_notes": "Figure 5-1, drawing 020847. SDS must be installed per NEC Articles 702, 705, and 750. All field conductors sized per NEC Article 310. L1 and L2 cross over internally in Eaton main breakers — if using lug kit, L2 left, L1 right."
+      }
+    },
+    {
+      "id": "specification.sds.ct_placement",
+      "alarm_name": "SDS External CT Placement and CAN Bus Termination",
+      "device": "SDS",
+      "friendly_name": "CT Wiring and CAN Bus Terminator Rules",
+      "alarm_type": "specification",
+      "sources": ["sds_a0008210373_installmanual_page26_screenshot"],
+      "engineering": {
+        "description": "External CT placement diagram and critical CAN bus termination rules. System chain shown: PWRcell 2 Battery → PWRcell 2 Inverter → Smart Combiner (if AC PV) → Smart Disconnect Switch (SDS) → Backup Load Center → Meter-Main Panel → Grid. Optional Shutdown Switch connects at the bottom of SDS.",
+        "trigger": "CTs installed in wrong location or CAN bus missing terminator are two of the most common installation errors causing communication and metering faults.",
+        "troubleshooting": [
+          "CAN bus terminator rule: A terminating resistor MUST be present at BOTH the beginning AND end of the CAN bus. The SDS ships with a CAN connector with a built-in terminating resistor — this resistor CANNOT be moved to a different connector. If terminating the CAN bus at a different device, fully remove the connector with the installed resistor.",
+          "CT placement: CTs must be installed above the point of interconnection and above all house loads. Typical location is at the Meter-Main Panel service entrance conductors.",
+          "CT orientation: SOURCE THIS SIDE label must point toward the utility service (toward the grid).",
+          "CT wiring colors: CT1A = yellow (Y), CT1B = green (G), CT2A = red (R), CT2B = black (B).",
+          "CT1 clamps Line 1 service conductor. CT2 clamps Line 2 service conductor.",
+          "If CTs cannot be installed on service conductors above interconnection point: L1 and L2 branch circuit conductors may be bundled separately in each CT, but system export will be limited to the Main Service Panel Backfeed Limit.",
+          "External CTs are INCLUDED with the Smart Combiner box for PWRmicro systems. They are sold SEPARATELY for SDS-only systems (no Smart Combiner)."
+        ],
+        "internal_notes": "Figure 5-6 (020853): CT placement diagram. Full system chain visible: Battery → Inverter → Smart Combiner → SDS → Backup Load Center → Meter-Main Panel → Grid. CTs go between Backup Load Center and Meter-Main Panel on the service conductors. CAN bus chain: SDS ↔ Inverter ↔ Battery (control circuit, max 262.5 ft total)."
+      }
+    },
+    {
+      "id": "specification.sds.status_led",
+      "alarm_name": "SDS Status LED Colors and System Operating Modes",
+      "device": "SDS",
+      "friendly_name": "Smart Disconnect Switch LED Codes and Operating Modes",
+      "alarm_type": "specification",
+      "sources": ["sds_a0008210373_installmanual_page36_screenshot"],
+      "engineering": {
+        "description": "SDS Status LED color and blink pattern reference table, plus descriptions of all operating modes: Grid Connected, Backup Mode, Sleep Mode, and PV Search Mode.",
+        "troubleshooting": [
+          "GREEN solid — Grid connected, Wi-Fi connected. Normal operation.",
+          "GREEN flashing (1s) — Backup Mode, Wi-Fi connected. Grid is out, system is running on battery.",
+          "BLUE flashing (1s) — Grid connected, NO Wi-Fi. Check Wi-Fi credentials or router.",
+          "BLUE/GREEN alternating (1s) — Backup Mode, no Wi-Fi. Grid out, running on battery, no internet.",
+          "ORANGE solid — ESS in Sleep Mode. Battery SOC dropped to 10% reserve, system is conserving.",
+          "ORANGE flashing (1s) — PV Search Mode activated. System trying to wake up from Sleep Mode using solar.",
+          "ORANGE/GREEN alternating (1s) — System performance limited. May indicate export limit or grid constraint.",
+          "GREEN/ORANGE/RED alternating (1s) — Initializing or firmware update in progress. Do not power off.",
+          "RED solid — System fault. Check Field Pro app for active fault codes.",
+          "RED slow flashing (2s) — System shutdown active. May be triggered by E-Stop or manual shutdown.",
+          "RED fast flashing (0.5s) — ESS overload. Battery/inverter is being overloaded — reduce load on backup panel."
+        ],
+        "internal_notes": "Grid Connected mode: SDS relay closed, PV covers home load first, battery discharges to cover excess load. Backup Mode sequence on grid loss: 1) SDS Grid relay opens, 2) daylight PV powers loads and charges battery, 3) if battery charged and load exceeds PV, PV relay opens, 4) when PV insufficient, ESS discharges. Sleep Mode at 10% SOC — use PV Search Mode to wake up. Generator (if equipped) turns on at 10% SOC, shuts off at 98% SOC. PV Search Mode can be enabled from PWRview Mobile App during daylight hours."
+      }
+    },
+    {
+      "id": "procedure.sds.commissioning_fieldpro",
+      "alarm_name": "SDS Commissioning with Field Pro App",
+      "device": "SDS",
+      "friendly_name": "Field Pro App Commissioning — Grid Profiles and Export Limits",
+      "alarm_type": "installation_procedure",
+      "sources": ["sds_a0008210373_installmanual_page31_screenshot"],
+      "engineering": {
+        "description": "Commissioning steps for the PWRcell 2 system using the Generac Field Pro app. Only Qualified Persons as defined by NEC may perform commissioning. Includes pre-commissioning checks, Field Pro app grid profile selection, and site export limit configuration.",
+        "troubleshooting": [
+          "Step 1 — Download Field Pro app from app store (iOS or Android).",
+          "Step 2 — Verify all connections are correctly tightened and perform tug tests on every wire.",
+          "Step 3 — Check isolation resistance of each AC and DC circuit.",
+          "Step 4 — Verify polarity of DC wiring and phasing of AC wiring.",
+          "Step 5 — Verify AC voltage before turning on power to SDS.",
+          "Step 6 — Turn ON the main breaker in SDS (if present) or the feeder breaker feeding SDS.",
+          "Step 7 — Turn ON the ESS 1 breaker in SDS.",
+          "Step 8 — Turn ON the BATTERY DISCONNECT switch on right side of battery cabinet.",
+          "Step 9 — Sign into Field Pro app and follow commissioning instructions for PWRcell 2.",
+          "Step 10 — Configure Grid Settings: tap Grid Profile. Recommended profile(s) display automatically based on site address. Available profiles: CA Rule 21, IEEE 1547-2013, IEEE 1547a-2014, IEEE 1547-2018, ISO-NE 2018, PECO 2021. Select the appropriate one and tap Done.",
+          "Step 11 — If utility requires export limit: turn on Site Export Limit, enter value 0-50 kW, tap Save.",
+          "Step 12 — Configure PCS (Power Control System) settings if required."
+        ],
+        "internal_notes": "Field Pro app is REQUIRED for commissioning — cannot commission without it. Grid profile auto-suggests based on GPS/site address. Site export limit range: 0-50 kW. Common profiles by region: California = CA Rule 21. Hawaii = Rule 14H. Most US = IEEE 1547-2018. New England = ISO-NE 2018. PCS settings control busbar overload protection — only qualified personnel may change these. Figure 6-1 (020876): Field Pro grid settings screenshot."
+      }
+    }
+  ,
+    {
+      "id": "specification.pwrmicro.system_topology_diagram",
+      "alarm_name": "PWRmicro System Topology and Disconnect Tool",
+      "device": "PWRmicro",
+      "friendly_name": "PWRmicro System Flow and Disconnect Tool Usage",
+      "alarm_type": "specification",
+      "sources": ["pwrmicro_installationmanual_english_page12_page21_screenshots"],
+      "engineering": {
+        "description": "PWRmicro system flow diagram (Figure 2-4) and Disconnect Tool reference (Figure 4-11). System chain: PV Modules (A) → PWRmicro Inverters (B) → Modular Trunk Cables (C) → Junction Box (D) → Smart Combiner (E) → Main Panel (F) → Utility Meter (G). Communication runs back from Smart Combiner to each PWRmicro via PLC over the trunk cables.",
+        "troubleshooting": [
+          "System flow: PV Modules → PWRmicros (one unit per 2 modules) → Trunk Cables daisy-chain PWRmicros together → Junction Box collects the AC circuit → Smart Combiner breaker → Main Panel breaker → Utility Meter → Grid.",
+          "Up to 7 PWRmicros per AC circuit at 240V (6 at 208V), all terminating at one 2-pole breaker inside the Smart Combiner.",
+          "Up to 28 PWRmicros total per Smart Combiner (across up to 5 circuits).",
+          "Disconnect Tool (APKE00102) — required to unplug any connector without damage: A (AC end) disconnects AC trunk cable connections. B (DC end) disconnects DC connections at PWRmicro. C (side tool) disconnects MC4 connections to PV modules.",
+          "NEVER unplug AC or DC connectors under load — open PV breakers and render equipment inoperable before using disconnect tool.",
+          "If a PWRmicro shows DC connected but AC open (continuous blinking LED) after AC is applied — internal fuses may be open. Contact Generac Clean Energy Technical Support — do not attempt to open the unit."
+        ],
+        "internal_notes": "Figure 2-4 (021150): system topology diagram. Figure 4-11 (021189): disconnect tool diagram. Disconnect Tool part number: APKE00102. PWRmicro is compatible with 60-cell, 66-cell, and 72-cell modules including half-cut cell variants. For single-module connections, cap the unused DC port with DC Male Connector Cap APKE00100."
+      }
+    }
   ]
 }
