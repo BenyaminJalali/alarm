@@ -8,23 +8,25 @@
       "device": "PWRmicro",
       "friendly_name": "Micro-Inverter Design Rules",
       "alarm_type": "installation_procedure",
-      "sources": ["PWRmicro_DesignChecklist_v1.3"],
+      "sources": [
+        "PWRmicro_DesignChecklist_v1.3"
+      ],
       "engineering": {
         "description": "13-step design checklist that must be completed before installing a PWRmicro system. Covers PV module compatibility, circuit sizing, cable sizing, and code compliance.",
         "troubleshooting": [
-          "Step 1 — Verify PV module compatibility: Vmp (STC) must be less than 42.5V, Isc must be less than 18A, Voc must be less than 70V.",
-          "Step 2 — Verify PV module NOCT temperature coefficient is within spec.",
-          "Step 3 — Determine number of PWRmicros per AC circuit: max 7 per 30A circuit at 240V, max 6 per 30A circuit at 208V.",
-          "Step 4 — Max 28 PWRmicros per Smart Combiner (APKEAC100).",
-          "Step 5 — Size AC circuit: PWRmicro output is 3.42A at 240V (2.85A at 208V). Multiply by 1.25 NEC continuous load factor.",
-          "Step 6 — Verify AC cable sizing meets NEC 690.8 continuous load requirements.",
-          "Step 7 — Verify DC cable sizing: use voltage drop tables for AWG 8/10/12/14 at system voltage.",
-          "Step 8 — Confirm rapid shutdown compliance per NEC 690.12 — Smart Combiner provides module-level rapid shutdown.",
-          "Step 9 — Verify roof layout: portrait vs. landscape orientation, single-row vs. two-row, string length.",
-          "Step 10 — Verify ground fault protection is provided by the PWRmicro unit (built-in).",
-          "Step 11 — Confirm AC disconnect is within sight of the combiner per NEC 690.15.",
-          "Step 12 — Verify utility interconnection agreement and utility approval if required.",
-          "Step 13 — Complete design documentation and save to project folder before installation."
+          "Step 1 â€” Verify PV module compatibility: Vmp (STC) must be less than 42.5V, Isc must be less than 18A, Voc must be less than 70V.",
+          "Step 2 â€” Verify PV module NOCT temperature coefficient is within spec.",
+          "Step 3 â€” Determine number of PWRmicros per AC circuit: max 7 per 30A circuit at 240V, max 6 per 30A circuit at 208V.",
+          "Step 4 â€” Max 28 PWRmicros per Smart Combiner (APKEAC100).",
+          "Step 5 â€” Size AC circuit: PWRmicro output is 3.42A at 240V (2.85A at 208V). Multiply by 1.25 NEC continuous load factor.",
+          "Step 6 â€” Verify AC cable sizing meets NEC 690.8 continuous load requirements.",
+          "Step 7 â€” Verify DC cable sizing: use voltage drop tables for AWG 8/10/12/14 at system voltage.",
+          "Step 8 â€” Confirm rapid shutdown compliance per NEC 690.12 â€” Smart Combiner provides module-level rapid shutdown.",
+          "Step 9 â€” Verify roof layout: portrait vs. landscape orientation, single-row vs. two-row, string length.",
+          "Step 10 â€” Verify ground fault protection is provided by the PWRmicro unit (built-in).",
+          "Step 11 â€” Confirm AC disconnect is within sight of the combiner per NEC 690.15.",
+          "Step 12 â€” Verify utility interconnection agreement and utility approval if required.",
+          "Step 13 â€” Complete design documentation and save to project folder before installation."
         ],
         "internal_notes": "Max 7 PWRmicros per 30A circuit (240V) or 6 per circuit (208V). Max 28 per Smart Combiner. PWRmicro output: 3.42A at 240V. Vmp STC limit: 42.5V. Isc limit: 18A. Voc limit: 70V."
       }
@@ -35,7 +37,10 @@
       "device": "PWRmicro",
       "friendly_name": "Micro-Inverter AC Circuit Sizing Reference",
       "alarm_type": "specification",
-      "sources": ["PWRmicro_DesignChecklist_v1.3", "PWRmicro_VoltageDrop_Reference_Tables_v1.1"],
+      "sources": [
+        "PWRmicro_DesignChecklist_v1.3",
+        "PWRmicro_VoltageDrop_Reference_Tables_v1.1"
+      ],
       "engineering": {
         "description": "AC circuit sizing rules and voltage drop reference for PWRmicro micro-inverter systems at 240V and 208V.",
         "trigger": "Installer must size circuits correctly to avoid nuisance breaker trips or code violations.",
@@ -59,19 +64,21 @@
       "device": "PWRmicro",
       "friendly_name": "Micro-Inverter Bill of Materials",
       "alarm_type": "specification",
-      "sources": ["PWRmicro_BOM_Template_v1"],
+      "sources": [
+        "PWRmicro_BOM_Template_v1"
+      ],
       "engineering": {
         "description": "Complete bill of materials for a PWRmicro micro-inverter system including part numbers for all major components, cables, and accessories.",
-        "internal_notes": "Key part numbers: APKEAC100 = Smart Combiner. APKEPM820 = PWRmicro inverter unit. DC trunk cable, DC branch cables (Y-connectors), AC combiner cables. Mounting hardware: rail system compatible with major rail brands. Rapid shutdown: integrated in Smart Combiner per NEC 690.12. Communication: Zigbee mesh between PWRmicro units and Smart Combiner — does NOT use CAN bus (CAN bus is for R2 battery/inverter/gateway only).",
+        "internal_notes": "Key part numbers: APKEAC100 = Smart Combiner. APKEPM820 = PWRmicro inverter unit. DC trunk cable, DC branch cables (Y-connectors), AC combiner cables. Mounting hardware: rail system compatible with major rail brands. Rapid shutdown: integrated in Smart Combiner per NEC 690.12. Communication: Zigbee mesh between PWRmicro units and Smart Combiner â€” does NOT use CAN bus (CAN bus is for R2 battery/inverter/gateway only).",
         "troubleshooting": [
-          "PWRmicro = APKEPM820 — one per PV module.",
-          "Smart Combiner = APKEAC100 — one per string up to 28 PWRmicros.",
-          "DC trunk cable — single cable running along the row connecting all PWRmicros.",
-          "DC branch cables — Y-connectors attaching each PWRmicro to the trunk.",
-          "AC output cable — from Smart Combiner to AC breaker panel or subpanel.",
-          "Mounting brackets — attach PWRmicro to rail between PV module and rail.",
-          "Grounding hardware — per NEC 690 and local AHJ requirements.",
-          "Communication gateway (if monitoring needed) — connects to home network, reports to Generac Fleet."
+          "PWRmicro = APKEPM820 â€” one per PV module.",
+          "Smart Combiner = APKEAC100 â€” one per string up to 28 PWRmicros.",
+          "DC trunk cable â€” single cable running along the row connecting all PWRmicros.",
+          "DC branch cables â€” Y-connectors attaching each PWRmicro to the trunk.",
+          "AC output cable â€” from Smart Combiner to AC breaker panel or subpanel.",
+          "Mounting brackets â€” attach PWRmicro to rail between PV module and rail.",
+          "Grounding hardware â€” per NEC 690 and local AHJ requirements.",
+          "Communication gateway (if monitoring needed) â€” connects to home network, reports to Generac Fleet."
         ]
       }
     },
@@ -81,17 +88,19 @@
       "device": "SDS",
       "friendly_name": "SDS Cabinet Mounting (QSG)",
       "alarm_type": "installation_procedure",
-      "sources": ["qsg_pwrcell2_mounting_sds"],
+      "sources": [
+        "qsg_pwrcell2_mounting_sds"
+      ],
       "engineering": {
         "description": "7-step procedure for mounting the Smart Disconnect Switch (SDS/MANTA) cabinet on the wall. Must be done before wiring.",
         "troubleshooting": [
-          "Step 1 — Choose mounting location: flat wall, rated for outdoor use, accessible for maintenance. Check clearance requirements.",
-          "Step 2 — Mark the top line on the wall at 84.5 inches from the floor (top of bracket position).",
-          "Step 3 — Measure bracket position from the top line and mark drill points.",
-          "Step 4 — Pre-drill pilot holes for the mounting bracket using appropriate bit for wall material (concrete, stud, etc.).",
-          "Step 5 — Punch conduit knockout in the cabinet bottom for conduit entry.",
-          "Step 6 — Hang the cabinet on the bracket.",
-          "Step 7 — Fasten cabinet securely to wall with all provided hardware. Verify level."
+          "Step 1 â€” Choose mounting location: flat wall, rated for outdoor use, accessible for maintenance. Check clearance requirements.",
+          "Step 2 â€” Mark the top line on the wall at 84.5 inches from the floor (top of bracket position).",
+          "Step 3 â€” Measure bracket position from the top line and mark drill points.",
+          "Step 4 â€” Pre-drill pilot holes for the mounting bracket using appropriate bit for wall material (concrete, stud, etc.).",
+          "Step 5 â€” Punch conduit knockout in the cabinet bottom for conduit entry.",
+          "Step 6 â€” Hang the cabinet on the bracket.",
+          "Step 7 â€” Fasten cabinet securely to wall with all provided hardware. Verify level."
         ],
         "internal_notes": "Top line at 84.5 inches from floor. Must be grounded per NEC 250. Conduit entry from bottom. De-energize all circuits before any wiring work."
       }
@@ -102,20 +111,22 @@
       "device": "BMU",
       "friendly_name": "Battery Cabinet Mounting (QSG)",
       "alarm_type": "installation_procedure",
-      "sources": ["qsg_pwrcell2_mounting_battery"],
+      "sources": [
+        "qsg_pwrcell2_mounting_battery"
+      ],
       "engineering": {
         "description": "8-step procedure for mounting the R2 Battery (BMU) cabinet on the wall. Battery modules must be removed before mounting, then reloaded back-first.",
         "troubleshooting": [
-          "Step 1 — Remove all battery modules from the cabinet before mounting (reduces weight significantly).",
-          "Step 2 — Choose mounting location: flat wall, rated for outdoor/indoor use per nameplate, adequate clearance on all sides.",
-          "Step 3 — Mark the top bracket line on the wall.",
-          "Step 4 — Pre-drill pilot holes for mounting bracket.",
-          "Step 5 — Punch conduit knockout for wiring entry.",
-          "Step 6 — Hang the empty cabinet on the wall bracket.",
-          "Step 7 — Fasten all mounting hardware securely. Verify plumb and level.",
-          "Step 8 — Reload battery modules back-first (terminal end facing in). Ensure grounding clips engage on each module."
+          "Step 1 â€” Remove all battery modules from the cabinet before mounting (reduces weight significantly).",
+          "Step 2 â€” Choose mounting location: flat wall, rated for outdoor/indoor use per nameplate, adequate clearance on all sides.",
+          "Step 3 â€” Mark the top bracket line on the wall.",
+          "Step 4 â€” Pre-drill pilot holes for mounting bracket.",
+          "Step 5 â€” Punch conduit knockout for wiring entry.",
+          "Step 6 â€” Hang the empty cabinet on the wall bracket.",
+          "Step 7 â€” Fasten all mounting hardware securely. Verify plumb and level.",
+          "Step 8 â€” Reload battery modules back-first (terminal end facing in). Ensure grounding clips engage on each module."
         ],
-        "internal_notes": "Battery modules are heavy — always remove before mounting cabinet. Reload modules with terminal end facing inward (back-first). Grounding clips must engage on each module for proper grounding. DC wiring is high voltage — do not energize until all connections are verified. CAN bus communication cable connects battery to inverter."
+        "internal_notes": "Battery modules are heavy â€” always remove before mounting cabinet. Reload modules with terminal end facing inward (back-first). Grounding clips must engage on each module for proper grounding. DC wiring is high voltage â€” do not energize until all connections are verified. CAN bus communication cable connects battery to inverter."
       }
     },
     {
@@ -124,19 +135,21 @@
       "device": "INV",
       "friendly_name": "Inverter Mounting (QSG)",
       "alarm_type": "installation_procedure",
-      "sources": ["qsg_pwrcell2_mounting_inverter"],
+      "sources": [
+        "qsg_pwrcell2_mounting_inverter"
+      ],
       "engineering": {
         "description": "7-step procedure for mounting the R2 Inverter cabinet on the wall.",
         "troubleshooting": [
-          "Step 1 — Choose mounting location: flat wall, adequate clearance on all sides for airflow and maintenance access.",
-          "Step 2 — Mark the top line on the wall. Inverter bracket is 1/2 inch from the top line.",
-          "Step 3 — Measure bracket position (1/2 inch from top line) and mark drill points.",
-          "Step 4 — Pre-drill pilot holes for mounting bracket.",
-          "Step 5 — Punch conduit knockouts for wiring entry.",
-          "Step 6 — Hang inverter on the wall bracket.",
-          "Step 7 — Fasten all mounting hardware securely. Verify level."
+          "Step 1 â€” Choose mounting location: flat wall, adequate clearance on all sides for airflow and maintenance access.",
+          "Step 2 â€” Mark the top line on the wall. Inverter bracket is 1/2 inch from the top line.",
+          "Step 3 â€” Measure bracket position (1/2 inch from top line) and mark drill points.",
+          "Step 4 â€” Pre-drill pilot holes for mounting bracket.",
+          "Step 5 â€” Punch conduit knockouts for wiring entry.",
+          "Step 6 â€” Hang inverter on the wall bracket.",
+          "Step 7 â€” Fasten all mounting hardware securely. Verify level."
         ],
-        "internal_notes": "Inverter bracket is 1/2 inch from the top line (differs from SDS at 84.5 inches). Adequate airflow clearance is required — do not mount in enclosed space without ventilation. CAN bus cable connects inverter to battery and gateway."
+        "internal_notes": "Inverter bracket is 1/2 inch from the top line (differs from SDS at 84.5 inches). Adequate airflow clearance is required â€” do not mount in enclosed space without ventilation. CAN bus cable connects inverter to battery and gateway."
       }
     },
     {
@@ -145,21 +158,23 @@
       "device": "R2 System",
       "friendly_name": "Complete System Wiring (Torque Specs, Control Wiring, Ferrite Kits)",
       "alarm_type": "installation_procedure",
-      "sources": ["qsg_pwrcell2_wiring"],
+      "sources": [
+        "qsg_pwrcell2_wiring"
+      ],
       "engineering": {
         "description": "Complete wiring guide for R2 system including torque specifications, SDS breaker installation, control wiring, inverter wiring, and ferrite kit placement.",
         "troubleshooting": [
-          "Utility lug torque — 250kcmil to 2 AWG: 375 lb-in. 2 AWG to 6 AWG: 275 lb-in. Follow torque specs exactly to prevent loose connections and arc faults.",
-          "SDS breaker installation — Install the SDS breaker in the load center. De-energize load center before work. Verify breaker rating matches system spec.",
-          "Control wiring — Low-voltage CAN bus cables connect all devices: SDS, Inverter, Battery, and Gateway. Use CAN bus cables only — do NOT substitute with ethernet/CAT5/RJ45.",
-          "CAN bus termination — Install termination resistors at each end of the CAN bus chain. Missing terminators cause communication timeout alarms.",
-          "Inverter AC wiring — Connect utility side and load side per wiring diagram. Install ferrite kits (APKE00118) on inverter AC cables as shown.",
-          "Ferrite kit placement — APKE00118 ferrite cores must be installed on AC output cables at the inverter. Incorrect placement causes EMI issues.",
-          "Battery DC wiring — High voltage DC cables connect battery to inverter. Do not handle while energized. Torque DC cable lugs per spec.",
-          "Battery right or left entry — Battery cabinet supports conduit entry from right or left side. Select based on site conduit routing.",
-          "Final check — Verify all CAN bus cable terminations are tight. Verify all torque specs met. Verify ferrite kits installed. Before energizing, confirm no tools or debris inside cabinets."
+          "Utility lug torque â€” 250kcmil to 2 AWG: 375 lb-in. 2 AWG to 6 AWG: 275 lb-in. Follow torque specs exactly to prevent loose connections and arc faults.",
+          "SDS breaker installation â€” Install the SDS breaker in the load center. De-energize load center before work. Verify breaker rating matches system spec.",
+          "Control wiring â€” Low-voltage CAN bus cables connect all devices: SDS, Inverter, Battery, and Gateway. Use CAN bus cables only â€” do NOT substitute with ethernet/CAT5/RJ45.",
+          "CAN bus termination â€” Install termination resistors at each end of the CAN bus chain. Missing terminators cause communication timeout alarms.",
+          "Inverter AC wiring â€” Connect utility side and load side per wiring diagram. Install ferrite kits (APKE00118) on inverter AC cables as shown.",
+          "Ferrite kit placement â€” APKE00118 ferrite cores must be installed on AC output cables at the inverter. Incorrect placement causes EMI issues.",
+          "Battery DC wiring â€” High voltage DC cables connect battery to inverter. Do not handle while energized. Torque DC cable lugs per spec.",
+          "Battery right or left entry â€” Battery cabinet supports conduit entry from right or left side. Select based on site conduit routing.",
+          "Final check â€” Verify all CAN bus cable terminations are tight. Verify all torque specs met. Verify ferrite kits installed. Before energizing, confirm no tools or debris inside cabinets."
         ],
-        "internal_notes": "Torque specs: Utility lugs 250kcmil-2AWG = 375 lb-in. 2-6 AWG = 275 lb-in. Ferrite kit P/N: APKE00118 — required on inverter AC cables. CAN bus cables: proprietary twisted pair, NOT RJ45/ethernet. Termination resistors required at each end of CAN bus. DC wiring is high voltage — always de-energize before inspection. Battery supports right or left conduit entry."
+        "internal_notes": "Torque specs: Utility lugs 250kcmil-2AWG = 375 lb-in. 2-6 AWG = 275 lb-in. Ferrite kit P/N: APKE00118 â€” required on inverter AC cables. CAN bus cables: proprietary twisted pair, NOT RJ45/ethernet. Termination resistors required at each end of CAN bus. DC wiring is high voltage â€” always de-energize before inspection. Battery supports right or left conduit entry."
       }
     },
     {
@@ -168,20 +183,23 @@
       "device": "R2 System",
       "friendly_name": "CAN Bus Wiring and Troubleshooting",
       "alarm_type": "specification",
-      "sources": ["qsg_pwrcell2_wiring", "system_knowledge"],
+      "sources": [
+        "qsg_pwrcell2_wiring",
+        "system_knowledge"
+      ],
       "engineering": {
         "description": "The R2 platform uses CAN bus cables for communication between all devices. CAN bus is NOT ethernet, NOT RJ45, NOT CAT5. Understanding CAN bus wiring is essential for diagnosing communication alarms.",
         "trigger": "Communication alarms (timeout, offline, not responding) are often caused by CAN bus wiring issues: loose connections, missing terminators, wrong cable type, or damaged cable.",
         "troubleshooting": [
-          "CAN bus cable type — Proprietary twisted-pair cable with Generac connectors. Never substitute with ethernet, CAT5, or RJ45 cable.",
-          "CAN bus topology — Daisy-chain: Gateway → Inverter → Battery → SDS (or similar chain). One cable between each pair of devices.",
-          "Termination resistors — Required at each END of the CAN bus chain. Each end device needs a termination resistor. Missing terminator = communication failures.",
-          "Check all connections — CAN bus connectors must be fully seated and locked. A partially connected cable is a common cause of intermittent communication faults.",
-          "Check cable routing — CAN bus cables should not run parallel to AC or DC power cables for long distances (induces noise). Cross at 90 degrees if crossing is required.",
-          "If one device shows offline — Check the CAN cable to that specific device first. Also check the terminator on that end.",
-          "If all devices show offline — Gateway may be the issue, or power cycle the full system."
+          "CAN bus cable type â€” Proprietary twisted-pair cable with Generac connectors. Never substitute with ethernet, CAT5, or RJ45 cable.",
+          "CAN bus topology â€” Daisy-chain: Gateway â†’ Inverter â†’ Battery â†’ SDS (or similar chain). One cable between each pair of devices.",
+          "Termination resistors â€” Required at each END of the CAN bus chain. Each end device needs a termination resistor. Missing terminator = communication failures.",
+          "Check all connections â€” CAN bus connectors must be fully seated and locked. A partially connected cable is a common cause of intermittent communication faults.",
+          "Check cable routing â€” CAN bus cables should not run parallel to AC or DC power cables for long distances (induces noise). Cross at 90 degrees if crossing is required.",
+          "If one device shows offline â€” Check the CAN cable to that specific device first. Also check the terminator on that end.",
+          "If all devices show offline â€” Gateway may be the issue, or power cycle the full system."
         ],
-        "internal_notes": "CAN bus = Controller Area Network. Runs at 250kbps on R2 platform. Termination = 120 ohm resistors at each end. Cable is a Generac-proprietary twisted pair — not interchangeable with ethernet. Common failure: partially inserted connector, damaged cable from pinching, or missing terminator when a device is added to the chain."
+        "internal_notes": "CAN bus = Controller Area Network. Runs at 250kbps on R2 platform. Termination = 120 ohm resistors at each end. Cable is a Generac-proprietary twisted pair â€” not interchangeable with ethernet. Common failure: partially inserted connector, damaged cable from pinching, or missing terminator when a device is added to the chain."
       }
     },
     {
@@ -190,18 +208,20 @@
       "device": "PWRmicro",
       "friendly_name": "PWRmicro Introduction and Key Architecture",
       "alarm_type": "specification",
-      "sources": ["PWRmicro_Support_Resources_Introduction_Video"],
+      "sources": [
+        "PWRmicro_Support_Resources_Introduction_Video"
+      ],
       "engineering": {
-        "description": "PWRmicro is Generac's microinverter product line for rooftop solar. It uses a unique 2-to-1 architecture — one PWRmicro unit connects to two PV modules simultaneously. This differs from traditional microinverters that are 1-to-1. The Smart Combiner consolidates all circuits into one location.",
+        "description": "PWRmicro is Generac's microinverter product line for rooftop solar. It uses a unique 2-to-1 architecture â€” one PWRmicro unit connects to two PV modules simultaneously. This differs from traditional microinverters that are 1-to-1. The Smart Combiner consolidates all circuits into one location.",
         "trigger": "Installers new to PWRmicro often apply 1-to-1 microinverter rules (from Enphase or APsystems) incorrectly. PWRmicro is 2-to-1.",
         "threshold": "Smart Combiner: max 28 PWRmicro units (= 56 PV modules), max 100A total. Circuits: up to 30A breakers, up to 50% more AC watts per circuit vs traditional 1-to-1 microinverters.",
         "troubleshooting": [
           "PWRmicro is 2-to-1: one microinverter unit handles two PV modules. If a unit shows zero output, check both connected modules.",
           "Smart Combiner (APKEAC100): handles up to 28 PWRmicros (56 PV modules), up to 100A total.",
-          "Circuit design: supports 30A breakers per circuit — allowing up to 7 PWRmicros per circuit at 240V (see circuit sizing spec).",
-          "Communication: PWRmicro uses Power Line Communication (PLC) between microinverters and the Smart Combiner — NOT CAN bus (CAN bus is for R2 battery storage system only). Smart Combiner also has backup cellular, Wi-Fi, and Ethernet.",
+          "Circuit design: supports 30A breakers per circuit â€” allowing up to 7 PWRmicros per circuit at 240V (see circuit sizing spec).",
+          "Communication: PWRmicro uses Power Line Communication (PLC) between microinverters and the Smart Combiner â€” NOT CAN bus (CAN bus is for R2 battery storage system only). Smart Combiner also has backup cellular, Wi-Fi, and Ethernet.",
           "Training resources: ACPV 101 on Generac University (free, online, 1-2 hours). Design Guide, BOM Template, Design Checklist available as support tools.",
-          "Array shapes supported: portrait stackers, landscape arrays, single-module rows — all covered in Design Guide."
+          "Array shapes supported: portrait stackers, landscape arrays, single-module rows â€” all covered in Design Guide."
         ],
         "internal_notes": "PWRmicro is a SEPARATE product line from R2 battery storage. They can be installed together (complete energy solution) but are independent systems. PWRmicro uses PLC for device communication; R2 storage uses CAN bus. Lead: Isaac Opolinski, Field Applications team. Training course: ACPV 101 on Generac University."
       }
@@ -212,35 +232,38 @@
       "device": "PWRmicro",
       "friendly_name": "PV Module Specs for PWRmicro Compatibility",
       "alarm_type": "specification",
-      "sources": ["PWRmicro_DesignChecklist_v1.3"],
+      "sources": [
+        "PWRmicro_DesignChecklist_v1.3"
+      ],
       "engineering": {
         "description": "PV module electrical specifications that must be met for compatibility with the PWRmicro micro-inverter. Non-compatible modules can cause alarms or damage.",
         "threshold": "Vmp (STC): must be less than 42.5V. Isc (STC): must be less than 18A. Voc (STC): must be less than 70V. Check module datasheet under STC (Standard Test Conditions: 1000W/m2, 25C).",
         "trigger": "If PV module specs exceed these limits, the PWRmicro will not operate correctly and may generate overcurrent or overvoltage alarms.",
         "troubleshooting": [
-          "Step 1 — Obtain PV module datasheet and locate STC values for Vmp, Isc, and Voc.",
-          "Step 2 — Verify Vmp STC is below 42.5V. Most 60-cell and 72-cell modules meet this.",
-          "Step 3 — Verify Isc STC is below 18A. High-efficiency bifacial modules may approach this limit.",
-          "Step 4 — Verify Voc STC is below 70V.",
-          "Step 5 — Check NOCT (Nominal Operating Cell Temperature) temperature coefficient — verify within spec.",
-          "Step 6 — If module is borderline, check the PWRmicro PV Module Compatibility Calculator (APKEPM820) for confirmed compatibility.",
-          "Step 7 — Only use modules from the compatibility list for guaranteed performance."
+          "Step 1 â€” Obtain PV module datasheet and locate STC values for Vmp, Isc, and Voc.",
+          "Step 2 â€” Verify Vmp STC is below 42.5V. Most 60-cell and 72-cell modules meet this.",
+          "Step 3 â€” Verify Isc STC is below 18A. High-efficiency bifacial modules may approach this limit.",
+          "Step 4 â€” Verify Voc STC is below 70V.",
+          "Step 5 â€” Check NOCT (Nominal Operating Cell Temperature) temperature coefficient â€” verify within spec.",
+          "Step 6 â€” If module is borderline, check the PWRmicro PV Module Compatibility Calculator (APKEPM820) for confirmed compatibility.",
+          "Step 7 â€” Only use modules from the compatibility list for guaranteed performance."
         ],
-        "internal_notes": "Compatibility Calculator file: PWRmicro_PV_Module_Compatibility_Calculator_v1.0.xlsx — check for pre-validated modules. Vmp limit 42.5V, Isc limit 18A, Voc limit 70V all at STC. Do not use modules exceeding these limits even if they are 'close'."
+        "internal_notes": "Compatibility Calculator file: PWRmicro_PV_Module_Compatibility_Calculator_v1.0.xlsx â€” check for pre-validated modules. Vmp limit 42.5V, Isc limit 18A, Voc limit 70V all at STC. Do not use modules exceeding these limits even if they are 'close'."
       }
-    }
-  ,
+    },
     {
       "id": "specification.pwrmicro.technical_specs",
       "alarm_name": "PWRmicro Inverter Technical Specifications",
       "device": "PWRmicro",
       "friendly_name": "PWRmicro Electrical Specifications",
       "alarm_type": "specification",
-      "sources": ["pwrmicro_installationmanual_english"],
+      "sources": [
+        "pwrmicro_installationmanual_english"
+      ],
       "engineering": {
         "description": "Full electrical specifications for the PWRmicro micro-inverter (model APKEPM820) at 240V and 208V single phase.",
         "threshold": "Max DC Input Voltage: 70V. MPPT Voltage Range: 31-42.5V DC. Max Module Isc: 18A. DC Short Circuit Current Rating: 21A. Max Continuous Output: 3.42A (240V) / 3.94A (208V). Max Overcurrent Protection Per Circuit: 30A. Max PWRmicros per 30A circuit: 7 (240V) / 6 (208V). CEC Weighted Efficiency: 97%. Peak Inverter Efficiency: 97.3% (240V). Nighttime Power Consumption: 400mW. Weight: 8 lb (3.63 kg). Warranty: 25 years.",
-        "internal_notes": "Communication: Mesh Networked Power Line (Spread Spectrum Carrier) — NOT CAN bus. Ground Fault Protection: 2000V rms (transformer isolated). Ambient temp: -40 to 149°F (-40 to 65°C). Enclosure: Type 6. Certifications: UL1741, UL1741-SA, UL1741-SB, IEEE1547:2018, IEEE2030.5 CSIP, CA Rule 21, Rule 14H."
+        "internal_notes": "Communication: Mesh Networked Power Line (Spread Spectrum Carrier) â€” NOT CAN bus. Ground Fault Protection: 2000V rms (transformer isolated). Ambient temp: -40 to 149Â°F (-40 to 65Â°C). Enclosure: Type 6. Certifications: UL1741, UL1741-SA, UL1741-SB, IEEE1547:2018, IEEE2030.5 CSIP, CA Rule 21, Rule 14H."
       }
     },
     {
@@ -249,18 +272,20 @@
       "device": "SDS",
       "friendly_name": "SDS Electrical Specifications",
       "alarm_type": "specification",
-      "sources": ["sds_a0008210373_installmanual"],
+      "sources": [
+        "sds_a0008210373_installmanual"
+      ],
       "engineering": {
         "description": "Full electrical specifications for the PWRcell 2 Smart Disconnect Switch (SDS), part number APKE00067.",
-        "threshold": "AC Voltage: 120/240V. Grid Type: Single Phase. Current Rating: 200A. Short Circuit Current Rating: 22kA. Automatic Transfer Time: <50ms. System Control Method: 24V CAN. Maximum Backup Loads Panel: 200A. Maximum Non-Backup Loads Panel: 100A. AC PV input: 100A. ESS1 Breaker: 60A. Generator: up to 26kW. Dimensions: 17 x 7.1 x 36.4 in. Weight: 59 lb (26.76 kg). Operating Temp: -4 to 122°F (-20 to 50°C). Max Elevation: 6,561 ft (2,000m). Warranty: 10 years.",
+        "threshold": "AC Voltage: 120/240V. Grid Type: Single Phase. Current Rating: 200A. Short Circuit Current Rating: 22kA. Automatic Transfer Time: <50ms. System Control Method: 24V CAN. Maximum Backup Loads Panel: 200A. Maximum Non-Backup Loads Panel: 100A. AC PV input: 100A. ESS1 Breaker: 60A. Generator: up to 26kW. Dimensions: 17 x 7.1 x 36.4 in. Weight: 59 lb (26.76 kg). Operating Temp: -4 to 122Â°F (-20 to 50Â°C). Max Elevation: 6,561 ft (2,000m). Warranty: 10 years.",
         "troubleshooting": [
-          "Control method is 24V CAN bus — maximum control circuit length is 262.5 ft (80m) total across all devices (SDS to Inverter to Battery).",
+          "Control method is 24V CAN bus â€” maximum control circuit length is 262.5 ft (80m) total across all devices (SDS to Inverter to Battery).",
           "Control cable: 600V-rated #18 AWG shielded 4-conductor. Wires: blue CNTRL-, orange CNTRL+, black GND, red 24V+.",
-          "CAN bus terminating resistor: must be present at BOTH ends of the CAN bus. SDS ships with one installed — do not move it. If terminating at a different device, fully remove the connector with the installed resistor.",
+          "CAN bus terminating resistor: must be present at BOTH ends of the CAN bus. SDS ships with one installed â€” do not move it. If terminating at a different device, fully remove the connector with the installed resistor.",
           "Compatible main breakers (Eaton only): 100A=CSR2100N, 125A=CSR2125N, 150A=CSR2150N, 175A=CSR2175N, 200A=CSR2200N.",
           "ESS breaker: Eaton BR260 (60A 2-pole).",
           "AC PV breakers: Eaton BR220-BR2100 (20A-100A range).",
-          "Torque — Utility L1/L2 lug kit (250kcmil-2AWG): 375 in-lb. Backup Loads L1/L2 (2-6AWG): 275 in-lb. Neutral Lugs (300kcmil-6AWG): 275 in-lb. Lug kit/main breaker/bonding strap: 48 in-lb.",
+          "Torque â€” Utility L1/L2 lug kit (250kcmil-2AWG): 375 in-lb. Backup Loads L1/L2 (2-6AWG): 275 in-lb. Neutral Lugs (300kcmil-6AWG): 275 in-lb. Lug kit/main breaker/bonding strap: 48 in-lb.",
           "Bonding strap: MUST be installed if SDS is service entrance equipment. Do NOT install if SDS is fed from a feeder breaker.",
           "Rapid Shutdown: AC PV breaker turned OFF and front cover locked satisfies NEC 690.12 rapid shutdown if SDS is outdoors near service entrance.",
           "ESS Emergency Shutdown: Turn ESS1 breaker OFF and lock front cover, then turn off Battery Disconnect Switch on battery cabinet."
@@ -274,23 +299,25 @@
       "device": "R2 System",
       "friendly_name": "Pre-Commissioning and Field Pro App Steps",
       "alarm_type": "installation_procedure",
-      "sources": ["sds_a0008210373_installmanual"],
+      "sources": [
+        "sds_a0008210373_installmanual"
+      ],
       "engineering": {
         "description": "Pre-commissioning steps for PWRcell 2 system using the Generac Field Pro app. Must be completed in order before commissioning.",
         "troubleshooting": [
-          "Step 1 — Download the Field Pro app from the app store.",
-          "Step 2 — Verify all connections are correctly tightened and perform tug tests on all wiring.",
-          "Step 3 — Check isolation resistance of each AC and DC circuit.",
-          "Step 4 — Verify polarity of DC wiring and phasing of AC wiring is correct.",
-          "Step 5 — Verify AC voltage before turning on power to SDS.",
-          "Step 6 — Turn ON the main breaker in SDS (if present) or the feeder breaker feeding SDS.",
-          "Step 7 — Turn ON the ESS1 breaker in SDS.",
-          "Step 8 — Turn ON the BATTERY DISCONNECT switch on right side of battery cabinet.",
-          "Step 9 — Sign into Field Pro app and follow commissioning instructions for PWRcell 2 system.",
-          "Step 10 — Configure Grid Settings: tap Grid Profile, select Recommended profile for the site address, configure Site Export Limit (0-50 kW) if required by utility interconnection agreement.",
-          "Step 11 — Configure PCS (Power Control System) settings as required."
+          "Step 1 â€” Download the Field Pro app from the app store.",
+          "Step 2 â€” Verify all connections are correctly tightened and perform tug tests on all wiring.",
+          "Step 3 â€” Check isolation resistance of each AC and DC circuit.",
+          "Step 4 â€” Verify polarity of DC wiring and phasing of AC wiring is correct.",
+          "Step 5 â€” Verify AC voltage before turning on power to SDS.",
+          "Step 6 â€” Turn ON the main breaker in SDS (if present) or the feeder breaker feeding SDS.",
+          "Step 7 â€” Turn ON the ESS1 breaker in SDS.",
+          "Step 8 â€” Turn ON the BATTERY DISCONNECT switch on right side of battery cabinet.",
+          "Step 9 â€” Sign into Field Pro app and follow commissioning instructions for PWRcell 2 system.",
+          "Step 10 â€” Configure Grid Settings: tap Grid Profile, select Recommended profile for the site address, configure Site Export Limit (0-50 kW) if required by utility interconnection agreement.",
+          "Step 11 â€” Configure PCS (Power Control System) settings as required."
         ],
-        "internal_notes": "Field Pro app is required for commissioning — cannot commission without it. Grid profile is auto-suggested based on site address. Site export limit: 0-50 kW range. Only qualified persons per NEC may perform commissioning steps. If system won't commission, verify CAN bus termination at both ends first."
+        "internal_notes": "Field Pro app is required for commissioning â€” cannot commission without it. Grid profile is auto-suggested based on site address. Site export limit: 0-50 kW range. Only qualified persons per NEC may perform commissioning steps. If system won't commission, verify CAN bus termination at both ends first."
       }
     },
     {
@@ -299,18 +326,20 @@
       "device": "PWRmicro",
       "friendly_name": "Micro-Inverter LED Blink Codes",
       "alarm_type": "specification",
-      "sources": ["pwrmicro_installationmanual_english"],
+      "sources": [
+        "pwrmicro_installationmanual_english"
+      ],
       "engineering": {
         "description": "PWRmicro inverter LED blink patterns and their meaning. Green LED is on the right side of the unit and is visible after PV modules are connected and exposed to sunlight.",
         "troubleshooting": [
-          "Continuous blinking — DC connected but AC is open. If still continuous after AC is applied, internal fuses may be open. Contact Generac Clean Energy Technical Support.",
-          "1 blink every 16 seconds — Normal operation, inverter is bound to Smart Combiner.",
-          "1 blink every 8 seconds — Normal operation, inverter NOT yet bound to Smart Combiner.",
-          "2 blinks every 4 seconds — Inverter phase-locked to grid, no export, no errors.",
-          "3 blinks every 4 seconds — Inverter phase-locked to grid, Smart Combiner is in reset.",
-          "4 blinks every 4 seconds — ERROR: grid voltage out of range.",
-          "5 blinks every 4 seconds — ERROR: DC voltage out of range.",
-          "8 blinks every 4 seconds — ERROR: harmonic distortion."
+          "Continuous blinking â€” DC connected but AC is open. If still continuous after AC is applied, internal fuses may be open. Contact Generac Clean Energy Technical Support.",
+          "1 blink every 16 seconds â€” Normal operation, inverter is bound to Smart Combiner.",
+          "1 blink every 8 seconds â€” Normal operation, inverter NOT yet bound to Smart Combiner.",
+          "2 blinks every 4 seconds â€” Inverter phase-locked to grid, no export, no errors.",
+          "3 blinks every 4 seconds â€” Inverter phase-locked to grid, Smart Combiner is in reset.",
+          "4 blinks every 4 seconds â€” ERROR: grid voltage out of range.",
+          "5 blinks every 4 seconds â€” ERROR: DC voltage out of range.",
+          "8 blinks every 4 seconds â€” ERROR: harmonic distortion."
         ],
         "internal_notes": "LED is green. Visible after PV modules connected and in sunlight. 'Not bound to Smart Combiner' (1 blink/8s) is normal during initial installation before commissioning. If seeing 4 blinks (grid voltage error), check utility voltage with DMM before assuming inverter fault. If seeing 5 blinks (DC voltage error), check PV module Voc against 70V max limit."
       }
@@ -321,20 +350,22 @@
       "device": "PWRmicro",
       "friendly_name": "Smart Combiner Electrical and Physical Specs",
       "alarm_type": "specification",
-      "sources": ["pwrmicro_installationmanual_english"],
+      "sources": [
+        "pwrmicro_installationmanual_english"
+      ],
       "engineering": {
         "description": "Full specifications for the PWRmicro Smart Combiner, the central AC aggregation and communications hub for all PWRmicro circuits.",
-        "threshold": "Nominal Voltage: 120/240V or 120/208V single phase. Busbar Rating: 125A. Max PV Output Current: 100A. Number of AC PV Circuits (2-pole): 5. Max PWRmicros: 28 at 240VAC (24 at 208VAC). Circuit Breaker: Eaton 2-pole Type BR only. Production CT: 200A revenue grade (+/-0.5%). Internet: Wi-Fi or Ethernet. Cellular: LTE (for remote support and firmware updates only). Ambient temp: -40 to 131°F (-40 to 55°C). Enclosure: Type 3R. Weight: 29 lb (13.15 kg). Warranty: 10 years.",
+        "threshold": "Nominal Voltage: 120/240V or 120/208V single phase. Busbar Rating: 125A. Max PV Output Current: 100A. Number of AC PV Circuits (2-pole): 5. Max PWRmicros: 28 at 240VAC (24 at 208VAC). Circuit Breaker: Eaton 2-pole Type BR only. Production CT: 200A revenue grade (+/-0.5%). Internet: Wi-Fi or Ethernet. Cellular: LTE (for remote support and firmware updates only). Ambient temp: -40 to 131Â°F (-40 to 55Â°C). Enclosure: Type 3R. Weight: 29 lb (13.15 kg). Warranty: 10 years.",
         "troubleshooting": [
           "Only Eaton type BR breakers up to 30A may be installed in the Smart Combiner for AC PV circuits.",
           "Breaker sizing by number of PWRmicros: 1-3 units = 15A (BR215). 4 units = 20A (BR220). 5 units = 25A (BR225). 6-7 units = 30A (BR230).",
           "Do NOT remove or relocate the 15A breaker for the Smart Combiner Gateway and Control Board.",
           "Torque for utility L1/L2 connection: 50 in-lb. Neutral lug (6-2/0 AWG): 120 in-lb, (8 AWG): 40 in-lb, (10-14 AWG): 35 in-lb.",
-          "External CTs (200A, revenue grade) are included in the box — Generac recommends installing them in every PWRmicro system.",
+          "External CTs (200A, revenue grade) are included in the box â€” Generac recommends installing them in every PWRmicro system.",
           "Min install height: 36 in (91 cm) from grade. Min clearance: 0.5 in top and bottom of each PWRmicro, 3 in sides.",
-          "Smart Combiner uses PLC (Power Line Communication) to communicate with PWRmicro inverters — NOT CAN bus."
+          "Smart Combiner uses PLC (Power Line Communication) to communicate with PWRmicro inverters â€” NOT CAN bus."
         ],
-        "internal_notes": "Smart Combiner part number: APKEAC100. Control board has a 15A breaker — never remove. Gateway/control board has a separate 15A circuit. Up to 5 separate AC PV circuits (5 x 2-pole breakers). Cellular is built-in for remote support only, not primary monitoring. Wi-Fi reset button is inside wiring compartment."
+        "internal_notes": "Smart Combiner part number: APKEAC100. Control board has a 15A breaker â€” never remove. Gateway/control board has a separate 15A circuit. Up to 5 separate AC PV circuits (5 x 2-pole breakers). Cellular is built-in for remote support only, not primary monitoring. Wi-Fi reset button is inside wiring compartment."
       }
     },
     {
@@ -343,64 +374,68 @@
       "device": "SDS",
       "friendly_name": "Smart Disconnect Switch Wiring Connections",
       "alarm_type": "specification",
-      "sources": ["sds_a0008210373_installmanual"],
+      "sources": [
+        "sds_a0008210373_installmanual"
+      ],
       "engineering": {
-        "description": "Wiring compartment layout for the PWRcell 2 Smart Disconnect Switch — identifies all connection points and their purposes.",
+        "description": "Wiring compartment layout for the PWRcell 2 Smart Disconnect Switch â€” identifies all connection points and their purposes.",
         "troubleshooting": [
-          "Utility Connection L1, L2 — main utility input (lug kit or Eaton main breaker).",
-          "Backup Loads Connection L1, L2 — output to backup loads subpanel (200A max).",
-          "AC PV Breaker — up to 100A, for AC-coupled solar (Enphase IQ7/IQ8 compatible).",
-          "ESS1 Breaker (60A, BR260) — PWRcell 2 battery storage system connection.",
-          "Non-Backup Loads L1, L2 — output to non-backup loads subpanel (100A rated bus).",
-          "Generator Connection L1, L2 — Generac generator up to 26kW.",
-          "Control Circuit Wiring Terminals — CAN bus connection to inverter and battery.",
-          "Remote Stop (E-Stop) Terminals — normally closed circuit; opening it shuts down entire system.",
-          "Wi-Fi Reset Button — inside wiring compartment.",
-          "Ground Bar — all equipment ground connections.",
-          "Neutral Lugs — shared between utility and backup loads.",
-          "L1 and L2 cross over internally inside Eaton main breakers — if using lug kit, L2 terminates left, L1 terminates right."
+          "Utility Connection L1, L2 â€” main utility input (lug kit or Eaton main breaker).",
+          "Backup Loads Connection L1, L2 â€” output to backup loads subpanel (200A max).",
+          "AC PV Breaker â€” up to 100A, for AC-coupled solar (Enphase IQ7/IQ8 compatible).",
+          "ESS1 Breaker (60A, BR260) â€” PWRcell 2 battery storage system connection.",
+          "Non-Backup Loads L1, L2 â€” output to non-backup loads subpanel (100A rated bus).",
+          "Generator Connection L1, L2 â€” Generac generator up to 26kW.",
+          "Control Circuit Wiring Terminals â€” CAN bus connection to inverter and battery.",
+          "Remote Stop (E-Stop) Terminals â€” normally closed circuit; opening it shuts down entire system.",
+          "Wi-Fi Reset Button â€” inside wiring compartment.",
+          "Ground Bar â€” all equipment ground connections.",
+          "Neutral Lugs â€” shared between utility and backup loads.",
+          "L1 and L2 cross over internally inside Eaton main breakers â€” if using lug kit, L2 terminates left, L1 terminates right."
         ],
-        "internal_notes": "Compatible AC PV (3rd party): Enphase IQ 7 and IQ 8 Microinverters ONLY. ESS2 input exists but not currently used. E-Stop circuit is normally closed — a break (open circuit) shuts everything down. Max control circuit distance: 262.5 ft (80m) SDS to Inverter to Battery combined."
+        "internal_notes": "Compatible AC PV (3rd party): Enphase IQ 7 and IQ 8 Microinverters ONLY. ESS2 input exists but not currently used. E-Stop circuit is normally closed â€” a break (open circuit) shuts everything down. Max control circuit distance: 262.5 ft (80m) SDS to Inverter to Battery combined."
       }
-    }
-  ,
+    },
     {
       "id": "specification.pwrmicro.module_compatibility_calculator",
       "alarm_name": "PWRmicro PV Module Compatibility Calculator",
       "device": "PWRmicro",
       "friendly_name": "JA Solar Module Compatibility List",
       "alarm_type": "specification",
-      "sources": ["PWRmicro_PV_Module_Compatibility_Calculator_v1.0_2026.01.26.xlsx"],
+      "sources": [
+        "PWRmicro_PV_Module_Compatibility_Calculator_v1.0_2026.01.26.xlsx"
+      ],
       "engineering": {
         "description": "The PWRmicro compatibility calculator checks PV modules against PWRmicro thresholds. v1.0 (Jan 2026) pre-loads 308 JA Solar module models. Compatibility is determined by checking Isc, Voc, and Vmp against PWRmicro limits at low and high temperature extremes based on IECC climate zone.",
         "threshold": "PWRmicro limits: Isc max 18A, Voc max 70V, Vmp low 24V, Vmp high 51V, MPPT voltage 31.699-42.5V (climate zones 1-3) or 32.499-42.5V (zones 4+). A module is SUPPORTED only if it passes ALL checks at both low and high temperature limits.",
         "troubleshooting": [
-          "To check module compatibility: obtain module datasheet, enter Pmax, Isc STC, Voc STC, Vpmax STC, temperature coefficients (αIsc, βVoc), and IECC climate zone into calculator.",
-          "The most common failure mode is Voc too high at low temperatures — cold weather increases open-circuit voltage. Always check Voc at the lowest expected temperature for the site.",
-          "Isc limit is 18A — high-efficiency bifacial modules or modules with backside gain may approach this limit.",
+          "To check module compatibility: obtain module datasheet, enter Pmax, Isc STC, Voc STC, Vpmax STC, temperature coefficients (Î±Isc, Î²Voc), and IECC climate zone into calculator.",
+          "The most common failure mode is Voc too high at low temperatures â€” cold weather increases open-circuit voltage. Always check Voc at the lowest expected temperature for the site.",
+          "Isc limit is 18A â€” high-efficiency bifacial modules or modules with backside gain may approach this limit.",
           "MPPT voltage range is 31.699-42.5V (IECC zones 1-3) or 32.499-42.5V (zones 4+). Modules with Vmp outside this range will not be harvested efficiently.",
           "If a module is not in the calculator, manually check: Isc < 18A, Voc < 70V at the lowest expected temperature, Vmp within MPPT range.",
           "JA Solar models pre-loaded in v1.0 calculator (308 models): JAM5-72, JAM6-60, JAM6-72, JAP6-60, JAP6-72, JAM60S, JAM72S, JAM72D, JAM54S, JAM54D, JAM78D, JAM78S, JAM66D series from 170W to 620W."
         ],
-        "internal_notes": "Calculator file: PWRmicro_PV_Module_Compatibility_Calculator_v1.0_2026.01.26.xlsx. Contains 3 sheets: 'Module Compatibility Calculator' (input), 'Calculations' (308 JA Solar models), 'CEC 04-01-25' (full CEC module database with 21,000+ modules). The CEC sheet can theoretically be used to find specs for any CEC-listed module and manually verify compatibility. File is formula-based — requires Excel to run. Formulas cannot be evaluated by Python without Excel."
+        "internal_notes": "Calculator file: PWRmicro_PV_Module_Compatibility_Calculator_v1.0_2026.01.26.xlsx. Contains 3 sheets: 'Module Compatibility Calculator' (input), 'Calculations' (308 JA Solar models), 'CEC 04-01-25' (full CEC module database with 21,000+ modules). The CEC sheet can theoretically be used to find specs for any CEC-listed module and manually verify compatibility. File is formula-based â€” requires Excel to run. Formulas cannot be evaluated by Python without Excel."
       }
-    }
-  ,
+    },
     {
       "id": "specification.bmu.system_overview",
       "alarm_name": "PWRcell 2 System Overview and Model Naming",
       "device": "BMU",
       "friendly_name": "Battery System Topology and Model Names",
       "alarm_type": "specification",
-      "sources": ["battery_a0008210367_installmanual_screenshots"],
+      "sources": [
+        "battery_a0008210367_installmanual_screenshots"
+      ],
       "engineering": {
-        "description": "PWRcell 2 system topology and battery model naming convention. The system connects: PWRcell 2 Battery → PWRcell 2 Inverter → Smart Disconnect Switch → Backup Load Center → Meter Socket → Grid. Optional AC PV Combiner connects at the Smart Disconnect Switch. Optional Shutdown Switch connects at the bottom of the Smart Disconnect Switch.",
+        "description": "PWRcell 2 system topology and battery model naming convention. The system connects: PWRcell 2 Battery â†’ PWRcell 2 Inverter â†’ Smart Disconnect Switch â†’ Backup Load Center â†’ Meter Socket â†’ Grid. Optional AC PV Combiner connects at the Smart Disconnect Switch. Optional Shutdown Switch connects at the bottom of the Smart Disconnect Switch.",
         "internal_notes": "Model naming: PWRcell 2 M3 = 3 modules = 9 kWh usable. M4 = 4 modules = 12 kWh. M5 = 5 modules = 15 kWh. M6 = 6 modules = 18 kWh. The number after M = number of battery modules installed in the cabinet. Each module adds 3 kWh of usable energy. Maximum is M6 (6 modules, 18 kWh). Figure reference: 020942 (system diagram), 020943 (model naming).",
         "troubleshooting": [
-          "If battery capacity seems wrong — check model number. M3=9kWh, M4=12kWh, M5=15kWh, M6=18kWh. Each module slot adds 3kWh.",
+          "If battery capacity seems wrong â€” check model number. M3=9kWh, M4=12kWh, M5=15kWh, M6=18kWh. Each module slot adds 3kWh.",
           "System power flow: Battery connects to Inverter via DC wiring (high voltage). Inverter connects to Smart Disconnect Switch via AC. SDS connects to Backup Load Center and to grid via Meter.",
           "AC PV (solar) connects at the Smart Disconnect Switch, not directly to the inverter or battery.",
-          "Optional Shutdown Switch (E-Stop) wires to the Smart Disconnect Switch control board — shutting it off kills the entire system."
+          "Optional Shutdown Switch (E-Stop) wires to the Smart Disconnect Switch control board â€” shutting it off kills the entire system."
         ]
       }
     },
@@ -410,19 +445,21 @@
       "device": "BMU",
       "friendly_name": "Battery Cabinet Minimum Clearances",
       "alarm_type": "specification",
-      "sources": ["battery_a0008210367_installmanual_screenshots"],
+      "sources": [
+        "battery_a0008210367_installmanual_screenshots"
+      ],
       "engineering": {
-        "description": "Minimum installation clearances for PWRcell 2 battery cabinet, inverter, and SDS — both single-unit and multi-unit configurations. Must comply with NEC 110.26.",
+        "description": "Minimum installation clearances for PWRcell 2 battery cabinet, inverter, and SDS â€” both single-unit and multi-unit configurations. Must comply with NEC 110.26.",
         "threshold": "Single unit (with inverter and SDS): left/right sides 8 in (20.3 cm), above cover 3 in (74 mm), below enclosure 1-5/8 in (41 mm), min enclosure height 71 in (180.3 cm), min working space height 6 ft 6 in (2.0 m), min working space width 7 ft 6-3/4 in (2.3 m). Inverter: 6 in above and below for passive cooling, 36 in min from grade. SDS: 32-3/4 in min from grade. Multiple batteries: 18 in between batteries (where UL 9540A test reports accepted), otherwise 36 in.",
         "troubleshooting": [
-          "Inverter requires 6 inches above AND below for passive cooling airflow — do not block these gaps.",
+          "Inverter requires 6 inches above AND below for passive cooling airflow â€” do not block these gaps.",
           "Minimum from grade: Inverter = 36 in (91 cm). SDS = 32-3/4 in (83 cm). Battery minimum height = 71 in (180 cm) for the cabinet.",
           "Multiple battery cabinets: 18 in between them if UL 9540A separation accepted by local AHJ. Otherwise 36 in required.",
           "Always maintain 8 in on left and right sides for all enclosures.",
-          "Minimum working space height is 6 ft 6 in — verify ceiling clearance at install site.",
+          "Minimum working space height is 6 ft 6 in â€” verify ceiling clearance at install site.",
           "All clearances must comply with NEC Article 110.26 working space requirements."
         ],
-        "internal_notes": "Figure 3-3 (020976): single-unit clearance diagram. Figure 3-4 (020977): multi-battery clearance diagram. 18 in battery separation only where UL 9540A test reports are accepted for reduced separation distances — otherwise 36 in is required by local code."
+        "internal_notes": "Figure 3-3 (020976): single-unit clearance diagram. Figure 3-4 (020977): multi-battery clearance diagram. 18 in battery separation only where UL 9540A test reports are accepted for reduced separation distances â€” otherwise 36 in is required by local code."
       }
     },
     {
@@ -431,48 +468,51 @@
       "device": "BMU",
       "friendly_name": "Battery Module Size and Mounting Bracket Placement",
       "alarm_type": "specification",
-      "sources": ["battery_a0008210367_installmanual_screenshots"],
+      "sources": [
+        "battery_a0008210367_installmanual_screenshots"
+      ],
       "engineering": {
         "description": "Physical dimensions of individual PWRcell 2 battery modules and mounting bracket placement measurements.",
-        "threshold": "Battery module dimensions: A (height) = 17.72 ± 0.08 in (450 ± 2 mm). B (depth) = 3.31 ± 0.08 in (84 ± 2 mm). C (width) = 17.32 ± 0.08 in (440 ± 2 mm). Mounting bracket: measure 17 in (43.18 cm) down from the top line to the top of the battery mounting bracket.",
+        "threshold": "Battery module dimensions: A (height) = 17.72 Â± 0.08 in (450 Â± 2 mm). B (depth) = 3.31 Â± 0.08 in (84 Â± 2 mm). C (width) = 17.32 Â± 0.08 in (440 Â± 2 mm). Mounting bracket: measure 17 in (43.18 cm) down from the top line to the top of the battery mounting bracket.",
         "troubleshooting": [
-          "Mounting bracket placement: measure 17 in (43.18 cm) DOWN from the established top line to the top of the mounting bracket — mark this point for reference.",
+          "Mounting bracket placement: measure 17 in (43.18 cm) DOWN from the established top line to the top of the mounting bracket â€” mark this point for reference.",
           "Use a level on the bracket to mark fastener holes accurately.",
           "Pre-drill holes before fastening bracket.",
-          "Fasten bracket to studs or structural members — never to drywall alone.",
-          "Each battery module is approximately 17.72 in tall and 17.32 in wide — plan shelf spacing accordingly when loading modules into the cabinet."
+          "Fasten bracket to studs or structural members â€” never to drywall alone.",
+          "Each battery module is approximately 17.72 in tall and 17.32 in wide â€” plan shelf spacing accordingly when loading modules into the cabinet."
         ],
-        "internal_notes": "Figure 3-5 (011292): battery module dimensions diagram. Figure 4-3 (020984): measure from top line diagram. Figure 4-4 (020985): mark bracket holes. Figure 4-5 (020986): pre-drill holes. Battery module is square-ish — 17.72 H x 17.32 W x 3.31 D inches per module."
+        "internal_notes": "Figure 3-5 (011292): battery module dimensions diagram. Figure 4-3 (020984): measure from top line diagram. Figure 4-4 (020985): mark bracket holes. Figure 4-5 (020986): pre-drill holes. Battery module is square-ish â€” 17.72 H x 17.32 W x 3.31 D inches per module."
       }
-    }
-  ,
+    },
     {
       "id": "specification.sds.wiring_compartment_diagram",
       "alarm_name": "SDS Wiring Compartment Full Label Map",
       "device": "SDS",
-      "friendly_name": "Smart Disconnect Switch Wiring Compartment — All Connection Points",
+      "friendly_name": "Smart Disconnect Switch Wiring Compartment â€” All Connection Points",
       "alarm_type": "specification",
-      "sources": ["sds_a0008210373_installmanual_page21_screenshot"],
+      "sources": [
+        "sds_a0008210373_installmanual_page21_screenshot"
+      ],
       "engineering": {
         "description": "Complete labeled diagram of the PWRcell 2 SDS wiring compartment (Figure 5-1). All connection points identified by letter. Reference this when an installer reports wiring in the wrong location or can't find where to connect a component.",
         "troubleshooting": [
-          "A — Utility Connection L1, L2 (lug kit or Eaton main breaker). This is where grid power comes in.",
-          "B — Backup Loads Connection L1, L2. Output to backup loads subpanel — what stays on during an outage.",
-          "C — AC PV Breaker (up to 100A). Where solar (Enphase IQ7/IQ8) connects.",
-          "D — ESS 2 — Not Used at This Time. Leave empty.",
-          "E — ESS 1 Breaker (60A). Where the PWRcell 2 battery storage system connects.",
-          "F — Non-Backup Loads Connection L1, L2 (100A rated bus). Loads that go offline during an outage.",
-          "G — Generator Connection L1, L2. Generac generator input.",
-          "H — Control Circuit Wiring Terminals (CAN bus). Blue CNTRL-, orange CNTRL+, black GND, red 24V+.",
-          "J — Remote Stop Terminals (E-Stop). Normally closed circuit — opening this shuts down the entire system.",
-          "K — Wi-Fi Reset Button.",
-          "L — Gen Control Wiring Terminals.",
-          "M — Main Relay Manual Override.",
-          "N — Ground Bar. All equipment grounds terminate here.",
-          "P — Utility/Backup Loads Neutral Lugs (shared neutral).",
-          "Q — Neutral Terminals."
+          "A â€” Utility Connection L1, L2 (lug kit or Eaton main breaker). This is where grid power comes in.",
+          "B â€” Backup Loads Connection L1, L2. Output to backup loads subpanel â€” what stays on during an outage.",
+          "C â€” AC PV Breaker (up to 100A). Where solar (Enphase IQ7/IQ8) connects.",
+          "D â€” ESS 2 â€” Not Used at This Time. Leave empty.",
+          "E â€” ESS 1 Breaker (60A). Where the PWRcell 2 battery storage system connects.",
+          "F â€” Non-Backup Loads Connection L1, L2 (100A rated bus). Loads that go offline during an outage.",
+          "G â€” Generator Connection L1, L2. Generac generator input.",
+          "H â€” Control Circuit Wiring Terminals (CAN bus). Blue CNTRL-, orange CNTRL+, black GND, red 24V+.",
+          "J â€” Remote Stop Terminals (E-Stop). Normally closed circuit â€” opening this shuts down the entire system.",
+          "K â€” Wi-Fi Reset Button.",
+          "L â€” Gen Control Wiring Terminals.",
+          "M â€” Main Relay Manual Override.",
+          "N â€” Ground Bar. All equipment grounds terminate here.",
+          "P â€” Utility/Backup Loads Neutral Lugs (shared neutral).",
+          "Q â€” Neutral Terminals."
         ],
-        "internal_notes": "Figure 5-1, drawing 020847. SDS must be installed per NEC Articles 702, 705, and 750. All field conductors sized per NEC Article 310. L1 and L2 cross over internally in Eaton main breakers — if using lug kit, L2 left, L1 right."
+        "internal_notes": "Figure 5-1, drawing 020847. SDS must be installed per NEC Articles 702, 705, and 750. All field conductors sized per NEC Article 310. L1 and L2 cross over internally in Eaton main breakers â€” if using lug kit, L2 left, L1 right."
       }
     },
     {
@@ -481,12 +521,14 @@
       "device": "SDS",
       "friendly_name": "CT Wiring and CAN Bus Terminator Rules",
       "alarm_type": "specification",
-      "sources": ["sds_a0008210373_installmanual_page26_screenshot"],
+      "sources": [
+        "sds_a0008210373_installmanual_page26_screenshot"
+      ],
       "engineering": {
-        "description": "External CT placement diagram and critical CAN bus termination rules. System chain shown: PWRcell 2 Battery → PWRcell 2 Inverter → Smart Combiner (if AC PV) → Smart Disconnect Switch (SDS) → Backup Load Center → Meter-Main Panel → Grid. Optional Shutdown Switch connects at the bottom of SDS.",
+        "description": "External CT placement diagram and critical CAN bus termination rules. System chain shown: PWRcell 2 Battery â†’ PWRcell 2 Inverter â†’ Smart Combiner (if AC PV) â†’ Smart Disconnect Switch (SDS) â†’ Backup Load Center â†’ Meter-Main Panel â†’ Grid. Optional Shutdown Switch connects at the bottom of SDS.",
         "trigger": "CTs installed in wrong location or CAN bus missing terminator are two of the most common installation errors causing communication and metering faults.",
         "troubleshooting": [
-          "CAN bus terminator rule: A terminating resistor MUST be present at BOTH the beginning AND end of the CAN bus. The SDS ships with a CAN connector with a built-in terminating resistor — this resistor CANNOT be moved to a different connector. If terminating the CAN bus at a different device, fully remove the connector with the installed resistor.",
+          "CAN bus terminator rule: A terminating resistor MUST be present at BOTH the beginning AND end of the CAN bus. The SDS ships with a CAN connector with a built-in terminating resistor â€” this resistor CANNOT be moved to a different connector. If terminating the CAN bus at a different device, fully remove the connector with the installed resistor.",
           "CT placement: CTs must be installed above the point of interconnection and above all house loads. Typical location is at the Meter-Main Panel service entrance conductors.",
           "CT orientation: SOURCE THIS SIDE label must point toward the utility service (toward the grid).",
           "CT wiring colors: CT1A = yellow (Y), CT1B = green (G), CT2A = red (R), CT2B = black (B).",
@@ -494,7 +536,7 @@
           "If CTs cannot be installed on service conductors above interconnection point: L1 and L2 branch circuit conductors may be bundled separately in each CT, but system export will be limited to the Main Service Panel Backfeed Limit.",
           "External CTs are INCLUDED with the Smart Combiner box for PWRmicro systems. They are sold SEPARATELY for SDS-only systems (no Smart Combiner)."
         ],
-        "internal_notes": "Figure 5-6 (020853): CT placement diagram. Full system chain visible: Battery → Inverter → Smart Combiner → SDS → Backup Load Center → Meter-Main Panel → Grid. CTs go between Backup Load Center and Meter-Main Panel on the service conductors. CAN bus chain: SDS ↔ Inverter ↔ Battery (control circuit, max 262.5 ft total)."
+        "internal_notes": "Figure 5-6 (020853): CT placement diagram. Full system chain visible: Battery â†’ Inverter â†’ Smart Combiner â†’ SDS â†’ Backup Load Center â†’ Meter-Main Panel â†’ Grid. CTs go between Backup Load Center and Meter-Main Panel on the service conductors. CAN bus chain: SDS â†” Inverter â†” Battery (control circuit, max 262.5 ft total)."
       }
     },
     {
@@ -503,134 +545,144 @@
       "device": "SDS",
       "friendly_name": "Smart Disconnect Switch LED Codes and Operating Modes",
       "alarm_type": "specification",
-      "sources": ["sds_a0008210373_installmanual_page36_screenshot"],
+      "sources": [
+        "sds_a0008210373_installmanual_page36_screenshot"
+      ],
       "engineering": {
         "description": "SDS Status LED color and blink pattern reference table, plus descriptions of all operating modes: Grid Connected, Backup Mode, Sleep Mode, and PV Search Mode.",
         "troubleshooting": [
-          "GREEN solid — Grid connected, Wi-Fi connected. Normal operation.",
-          "GREEN flashing (1s) — Backup Mode, Wi-Fi connected. Grid is out, system is running on battery.",
-          "BLUE flashing (1s) — Grid connected, NO Wi-Fi. Check Wi-Fi credentials or router.",
-          "BLUE/GREEN alternating (1s) — Backup Mode, no Wi-Fi. Grid out, running on battery, no internet.",
-          "ORANGE solid — ESS in Sleep Mode. Battery SOC dropped to 10% reserve, system is conserving.",
-          "ORANGE flashing (1s) — PV Search Mode activated. System trying to wake up from Sleep Mode using solar.",
-          "ORANGE/GREEN alternating (1s) — System performance limited. May indicate export limit or grid constraint.",
-          "GREEN/ORANGE/RED alternating (1s) — Initializing or firmware update in progress. Do not power off.",
-          "RED solid — System fault. Check Field Pro app for active fault codes.",
-          "RED slow flashing (2s) — System shutdown active. May be triggered by E-Stop or manual shutdown.",
-          "RED fast flashing (0.5s) — ESS overload. Battery/inverter is being overloaded — reduce load on backup panel."
+          "GREEN solid â€” Grid connected, Wi-Fi connected. Normal operation.",
+          "GREEN flashing (1s) â€” Backup Mode, Wi-Fi connected. Grid is out, system is running on battery.",
+          "BLUE flashing (1s) â€” Grid connected, NO Wi-Fi. Check Wi-Fi credentials or router.",
+          "BLUE/GREEN alternating (1s) â€” Backup Mode, no Wi-Fi. Grid out, running on battery, no internet.",
+          "ORANGE solid â€” ESS in Sleep Mode. Battery SOC dropped to 10% reserve, system is conserving.",
+          "ORANGE flashing (1s) â€” PV Search Mode activated. System trying to wake up from Sleep Mode using solar.",
+          "ORANGE/GREEN alternating (1s) â€” System performance limited. May indicate export limit or grid constraint.",
+          "GREEN/ORANGE/RED alternating (1s) â€” Initializing or firmware update in progress. Do not power off.",
+          "RED solid â€” System fault. Check Field Pro app for active fault codes.",
+          "RED slow flashing (2s) â€” System shutdown active. May be triggered by E-Stop or manual shutdown.",
+          "RED fast flashing (0.5s) â€” ESS overload. Battery/inverter is being overloaded â€” reduce load on backup panel."
         ],
-        "internal_notes": "Grid Connected mode: SDS relay closed, PV covers home load first, battery discharges to cover excess load. Backup Mode sequence on grid loss: 1) SDS Grid relay opens, 2) daylight PV powers loads and charges battery, 3) if battery charged and load exceeds PV, PV relay opens, 4) when PV insufficient, ESS discharges. Sleep Mode at 10% SOC — use PV Search Mode to wake up. Generator (if equipped) turns on at 10% SOC, shuts off at 98% SOC. PV Search Mode can be enabled from PWRview Mobile App during daylight hours."
+        "internal_notes": "Grid Connected mode: SDS relay closed, PV covers home load first, battery discharges to cover excess load. Backup Mode sequence on grid loss: 1) SDS Grid relay opens, 2) daylight PV powers loads and charges battery, 3) if battery charged and load exceeds PV, PV relay opens, 4) when PV insufficient, ESS discharges. Sleep Mode at 10% SOC â€” use PV Search Mode to wake up. Generator (if equipped) turns on at 10% SOC, shuts off at 98% SOC. PV Search Mode can be enabled from PWRview Mobile App during daylight hours."
       }
     },
     {
       "id": "procedure.sds.commissioning_fieldpro",
       "alarm_name": "SDS Commissioning with Field Pro App",
       "device": "SDS",
-      "friendly_name": "Field Pro App Commissioning — Grid Profiles and Export Limits",
+      "friendly_name": "Field Pro App Commissioning â€” Grid Profiles and Export Limits",
       "alarm_type": "installation_procedure",
-      "sources": ["sds_a0008210373_installmanual_page31_screenshot"],
+      "sources": [
+        "sds_a0008210373_installmanual_page31_screenshot"
+      ],
       "engineering": {
         "description": "Commissioning steps for the PWRcell 2 system using the Generac Field Pro app. Only Qualified Persons as defined by NEC may perform commissioning. Includes pre-commissioning checks, Field Pro app grid profile selection, and site export limit configuration.",
         "troubleshooting": [
-          "Step 1 — Download Field Pro app from app store (iOS or Android).",
-          "Step 2 — Verify all connections are correctly tightened and perform tug tests on every wire.",
-          "Step 3 — Check isolation resistance of each AC and DC circuit.",
-          "Step 4 — Verify polarity of DC wiring and phasing of AC wiring.",
-          "Step 5 — Verify AC voltage before turning on power to SDS.",
-          "Step 6 — Turn ON the main breaker in SDS (if present) or the feeder breaker feeding SDS.",
-          "Step 7 — Turn ON the ESS 1 breaker in SDS.",
-          "Step 8 — Turn ON the BATTERY DISCONNECT switch on right side of battery cabinet.",
-          "Step 9 — Sign into Field Pro app and follow commissioning instructions for PWRcell 2.",
-          "Step 10 — Configure Grid Settings: tap Grid Profile. Recommended profile(s) display automatically based on site address. Available profiles: CA Rule 21, IEEE 1547-2013, IEEE 1547a-2014, IEEE 1547-2018, ISO-NE 2018, PECO 2021. Select the appropriate one and tap Done.",
-          "Step 11 — If utility requires export limit: turn on Site Export Limit, enter value 0-50 kW, tap Save.",
-          "Step 12 — Configure PCS (Power Control System) settings if required."
+          "Step 1 â€” Download Field Pro app from app store (iOS or Android).",
+          "Step 2 â€” Verify all connections are correctly tightened and perform tug tests on every wire.",
+          "Step 3 â€” Check isolation resistance of each AC and DC circuit.",
+          "Step 4 â€” Verify polarity of DC wiring and phasing of AC wiring.",
+          "Step 5 â€” Verify AC voltage before turning on power to SDS.",
+          "Step 6 â€” Turn ON the main breaker in SDS (if present) or the feeder breaker feeding SDS.",
+          "Step 7 â€” Turn ON the ESS 1 breaker in SDS.",
+          "Step 8 â€” Turn ON the BATTERY DISCONNECT switch on right side of battery cabinet.",
+          "Step 9 â€” Sign into Field Pro app and follow commissioning instructions for PWRcell 2.",
+          "Step 10 â€” Configure Grid Settings: tap Grid Profile. Recommended profile(s) display automatically based on site address. Available profiles: CA Rule 21, IEEE 1547-2013, IEEE 1547a-2014, IEEE 1547-2018, ISO-NE 2018, PECO 2021. Select the appropriate one and tap Done.",
+          "Step 11 â€” If utility requires export limit: turn on Site Export Limit, enter value 0-50 kW, tap Save.",
+          "Step 12 â€” Configure PCS (Power Control System) settings if required."
         ],
-        "internal_notes": "Field Pro app is REQUIRED for commissioning — cannot commission without it. Grid profile auto-suggests based on GPS/site address. Site export limit range: 0-50 kW. Common profiles by region: California = CA Rule 21. Hawaii = Rule 14H. Most US = IEEE 1547-2018. New England = ISO-NE 2018. PCS settings control busbar overload protection — only qualified personnel may change these. Figure 6-1 (020876): Field Pro grid settings screenshot."
+        "internal_notes": "Field Pro app is REQUIRED for commissioning â€” cannot commission without it. Grid profile auto-suggests based on GPS/site address. Site export limit range: 0-50 kW. Common profiles by region: California = CA Rule 21. Hawaii = Rule 14H. Most US = IEEE 1547-2018. New England = ISO-NE 2018. PCS settings control busbar overload protection â€” only qualified personnel may change these. Figure 6-1 (020876): Field Pro grid settings screenshot."
       }
-    }
-  ,
+    },
     {
       "id": "specification.pwrmicro.system_topology_diagram",
       "alarm_name": "PWRmicro System Topology and Disconnect Tool",
       "device": "PWRmicro",
       "friendly_name": "PWRmicro System Flow and Disconnect Tool Usage",
       "alarm_type": "specification",
-      "sources": ["pwrmicro_installationmanual_english_page12_page21_screenshots"],
+      "sources": [
+        "pwrmicro_installationmanual_english_page12_page21_screenshots"
+      ],
       "engineering": {
-        "description": "PWRmicro system flow diagram (Figure 2-4) and Disconnect Tool reference (Figure 4-11). System chain: PV Modules (A) → PWRmicro Inverters (B) → Modular Trunk Cables (C) → Junction Box (D) → Smart Combiner (E) → Main Panel (F) → Utility Meter (G). Communication runs back from Smart Combiner to each PWRmicro via PLC over the trunk cables.",
+        "description": "PWRmicro system flow diagram (Figure 2-4) and Disconnect Tool reference (Figure 4-11). System chain: PV Modules (A) â†’ PWRmicro Inverters (B) â†’ Modular Trunk Cables (C) â†’ Junction Box (D) â†’ Smart Combiner (E) â†’ Main Panel (F) â†’ Utility Meter (G). Communication runs back from Smart Combiner to each PWRmicro via PLC over the trunk cables.",
         "troubleshooting": [
-          "System flow: PV Modules → PWRmicros (one unit per 2 modules) → Trunk Cables daisy-chain PWRmicros together → Junction Box collects the AC circuit → Smart Combiner breaker → Main Panel breaker → Utility Meter → Grid.",
+          "System flow: PV Modules â†’ PWRmicros (one unit per 2 modules) â†’ Trunk Cables daisy-chain PWRmicros together â†’ Junction Box collects the AC circuit â†’ Smart Combiner breaker â†’ Main Panel breaker â†’ Utility Meter â†’ Grid.",
           "Up to 7 PWRmicros per AC circuit at 240V (6 at 208V), all terminating at one 2-pole breaker inside the Smart Combiner.",
           "Up to 28 PWRmicros total per Smart Combiner (across up to 5 circuits).",
-          "Disconnect Tool (APKE00102) — required to unplug any connector without damage: A (AC end) disconnects AC trunk cable connections. B (DC end) disconnects DC connections at PWRmicro. C (side tool) disconnects MC4 connections to PV modules.",
-          "NEVER unplug AC or DC connectors under load — open PV breakers and render equipment inoperable before using disconnect tool.",
-          "If a PWRmicro shows DC connected but AC open (continuous blinking LED) after AC is applied — internal fuses may be open. Contact Generac Clean Energy Technical Support — do not attempt to open the unit."
+          "Disconnect Tool (APKE00102) â€” required to unplug any connector without damage: A (AC end) disconnects AC trunk cable connections. B (DC end) disconnects DC connections at PWRmicro. C (side tool) disconnects MC4 connections to PV modules.",
+          "NEVER unplug AC or DC connectors under load â€” open PV breakers and render equipment inoperable before using disconnect tool.",
+          "If a PWRmicro shows DC connected but AC open (continuous blinking LED) after AC is applied â€” internal fuses may be open. Contact Generac Clean Energy Technical Support â€” do not attempt to open the unit."
         ],
         "internal_notes": "Figure 2-4 (021150): system topology diagram. Figure 4-11 (021189): disconnect tool diagram. Disconnect Tool part number: APKE00102. PWRmicro is compatible with 60-cell, 66-cell, and 72-cell modules including half-cut cell variants. For single-module connections, cap the unused DC port with DC Male Connector Cap APKE00100."
       }
-    }
-  ,
+    },
     {
       "id": "procedure.bmu.module_installation_order",
       "alarm_name": "Battery Module Installation Order and Retention Clips",
       "device": "BMU",
       "friendly_name": "Battery Module Loading Sequence (M3/M4/M5/M6)",
       "alarm_type": "installation_procedure",
-      "sources": ["battery_a0008210367_installmanual_pages26-29_screenshots"],
+      "sources": [
+        "battery_a0008210367_installmanual_pages26-29_screenshots"
+      ],
       "engineering": {
         "description": "Battery module installation order for all configurations (M3, M4, M5, M6). Always install rear modules first, then front modules. M3 and M5 require a module spacer (odd number configurations).",
         "troubleshooting": [
           "Always install rear modules first regardless of configuration, then front modules.",
           "Module installation order by config: M3 = positions 1,2,3 rear + spacer in front slot. M4 = positions 1,2,3,4. M5 = positions 1,2,3,4,5 + spacer. M6 = positions 1,2,3,4,5,6 (full cabinet).",
-          "Installing rear modules: angle top of module (B) under and behind the bracket lip (C). Slide bottom to back of enclosure (E). Verify module rests against grounding clips (F) — factory installed, must make contact.",
+          "Installing rear modules: angle top of module (B) under and behind the bracket lip (C). Slide bottom to back of enclosure (E). Verify module rests against grounding clips (F) â€” factory installed, must make contact.",
           "Grounding tabs: install two L-shaped grounding tabs (A) at bottom of module on both sides. Fasten with M4x8mm star bit T20 screw at 13 in-lbs (1.47 Nm). Repeat at top.",
           "Module spacer (M3 and M5 only): angle top of spacer (L) under bracket lip (M). Slide up between brackets, push bottom toward enclosure. Secure with two M4x8mm T20 screws at 13 in-lbs (1.47 Nm).",
-          "Retention clips (all front modules): three types — P (double clip, between rows), Q (single O clip, top and bottom of stack), R (single X clip, top and bottom). Align clip holes with stud (T) and mounting hole (U). Apply gentle pressure to verify grounding tabs and clips contact battery modules. Secure with M4x8mm T20 screw at 13 in-lbs (1.47 Nm).",
+          "Retention clips (all front modules): three types â€” P (double clip, between rows), Q (single O clip, top and bottom of stack), R (single X clip, top and bottom). Align clip holes with stud (T) and mounting hole (U). Apply gentle pressure to verify grounding tabs and clips contact battery modules. Secure with M4x8mm T20 screw at 13 in-lbs (1.47 Nm).",
           "Battery module ports on each module: A=Status LED, B=SOC LED, C=COMM In Port, D=COMM Out Port, E=Battery Power Port."
         ],
-        "internal_notes": "Figure 4-11 (020993): module installation order diagrams for M3/M4/M5/M6. Grounding clips (F) are factory-installed on enclosure — they bite into battery module to provide equipment grounding. Spacer required ONLY for M3 and M5 (odd number). Retention clip types: P=double (between rows), Q=single marked O (top/bottom), R=single marked X (top/bottom). All fasteners M4x8mm star bit T20, 13 in-lbs."
+        "internal_notes": "Figure 4-11 (020993): module installation order diagrams for M3/M4/M5/M6. Grounding clips (F) are factory-installed on enclosure â€” they bite into battery module to provide equipment grounding. Spacer required ONLY for M3 and M5 (odd number). Retention clip types: P=double (between rows), Q=single marked O (top/bottom), R=single marked X (top/bottom). All fasteners M4x8mm star bit T20, 13 in-lbs."
       }
     },
     {
       "id": "specification.bmu.wiring_diagram",
       "alarm_name": "PWRcell 2 Battery BMU Wiring Diagram",
       "device": "BMU",
-      "friendly_name": "Battery Management Unit Wiring — All Connection Points",
+      "friendly_name": "Battery Management Unit Wiring â€” All Connection Points",
       "alarm_type": "specification",
-      "sources": ["battery_a0008210367_installmanual_page31_screenshot"],
+      "sources": [
+        "battery_a0008210367_installmanual_page31_screenshot"
+      ],
       "engineering": {
         "description": "PWRcell 2 Battery BMU wiring diagram (Figure 5-1) showing all connection points. Wire terminal specifications from Table 5-1. DC color convention: red=positive, black=negative, green=ground.",
         "troubleshooting": [
-          "A — Status LED / Battery Disconnect Switch (factory installed). This is the disconnect switch on the right side of the battery cabinet.",
-          "B — Module Comms (RJ45). Internal module communication port — NOT the CAN bus to other devices.",
-          "C — Control Circuit Terminals (24V+, GND, CTRL+, CTRL-). This IS the CAN bus connection to the inverter.",
-          "D — DC Power Terminals (DC+, DC-). High voltage DC connection to inverter BAT+/-.",
-          "E — Module Stack Power Cable (factory installed). Do not disconnect.",
-          "F — Ground Bar. Equipment grounding conductor from battery to inverter ground bar.",
-          "G — Not Used (reserved for legacy product). Leave empty.",
+          "A â€” Status LED / Battery Disconnect Switch (factory installed). This is the disconnect switch on the right side of the battery cabinet.",
+          "B â€” Module Comms (RJ45). Internal module communication port â€” NOT the CAN bus to other devices.",
+          "C â€” Control Circuit Terminals (24V+, GND, CTRL+, CTRL-). This IS the CAN bus connection to the inverter.",
+          "D â€” DC Power Terminals (DC+, DC-). High voltage DC connection to inverter BAT+/-.",
+          "E â€” Module Stack Power Cable (factory installed). Do not disconnect.",
+          "F â€” Ground Bar. Equipment grounding conductor from battery to inverter ground bar.",
+          "G â€” Not Used (reserved for legacy product). Leave empty.",
           "DC wiring: route #6 AWG THHN or THWN-2 from DC Power Terminals (D) to inverter BAT+/- terminals.",
           "Ferrite cores required if non-metallic conduit: install one ferrite on control circuit cable (C) and one on DC power cable (D). Part Number APKE00118, 6 qty required."
         ],
-        "internal_notes": "Figure 5-1 (021006): BMU wiring side view. IMPORTANT: Port B (Module Comms) uses RJ45 connectors for INTERNAL module-to-module communication WITHIN the battery cabinet — this is NOT the same as the CAN bus. The CAN bus (between battery, inverter, SDS) uses the Control Circuit Terminals at port C. Ferrite core part: APKE00118, 6 per installation. DC convention: red=positive, black=negative, green=ground per NEC 210.5(C)(2) and 215.12(C)(2)."
+        "internal_notes": "Figure 5-1 (021006): BMU wiring side view. IMPORTANT: Port B (Module Comms) uses RJ45 connectors for INTERNAL module-to-module communication WITHIN the battery cabinet â€” this is NOT the same as the CAN bus. The CAN bus (between battery, inverter, SDS) uses the Control Circuit Terminals at port C. Ferrite core part: APKE00118, 6 per installation. DC convention: red=positive, black=negative, green=ground per NEC 210.5(C)(2) and 215.12(C)(2)."
       }
     },
     {
       "id": "specification.bmu.wire_terminal_specs",
       "alarm_name": "PWRcell 2 Battery Wire Terminal Specifications",
       "device": "BMU",
-      "friendly_name": "Battery Wiring — AWG, Torque, and Strip Length",
+      "friendly_name": "Battery Wiring â€” AWG, Torque, and Strip Length",
       "alarm_type": "specification",
-      "sources": ["battery_a0008210367_installmanual_page32_screenshot"],
+      "sources": [
+        "battery_a0008210367_installmanual_page32_screenshot"
+      ],
       "engineering": {
-        "description": "PWRcell 2 Battery wire terminal specifications (Table 5-1). All conductors must be copper, rated 600V, sized per NEC Article 310, minimum 194°F (90°C) temperature rating.",
-        "threshold": "DC Power terminals: 4-6 AWG, no torque spec (hand tight), strip 3/8 in (10mm), 194°F (90°C) rated. Ground Bar: 4-6 AWG, 8 AWG, or 10 AWG, torque 45 in-lb (5 Nm), strip 3/8 in (10mm). Control Circuit terminals: 18 AWG, no torque spec, strip 3/8 in (10mm).",
+        "description": "PWRcell 2 Battery wire terminal specifications (Table 5-1). All conductors must be copper, rated 600V, sized per NEC Article 310, minimum 194Â°F (90Â°C) temperature rating.",
+        "threshold": "DC Power terminals: 4-6 AWG, no torque spec (hand tight), strip 3/8 in (10mm), 194Â°F (90Â°C) rated. Ground Bar: 4-6 AWG, 8 AWG, or 10 AWG, torque 45 in-lb (5 Nm), strip 3/8 in (10mm). Control Circuit terminals: 18 AWG, no torque spec, strip 3/8 in (10mm).",
         "troubleshooting": [
-          "DC Power (4-6 AWG): strip 3/8 in, no torque spec — hand tight. Use copper only, 600V rated, 194°F minimum.",
+          "DC Power (4-6 AWG): strip 3/8 in, no torque spec â€” hand tight. Use copper only, 600V rated, 194Â°F minimum.",
           "Ground Bar (4-6 AWG, 8 AWG, or 10 AWG): torque to 45 in-lb (5 Nm), strip 3/8 in.",
           "Control Circuit (18 AWG, 4-conductor): strip 3/8 in. Wire colors: red = 24V+, black = GND, orange = CTRL+, blue = CTRL-.",
           "CAN bus control circuit: max length 262.5 ft (80m) total across all devices (SDS to inverter to battery). Class 1 circuit.",
           "Control circuit wiring sequence: Terminate red 24V+, black GND, orange CTRL+, blue CTRL- at SDS. Route to inverter terminal set A. Route second cable from inverter terminal set B to battery terminal set (maintain same color pattern).",
-          "CAN bus terminating resistor: must be at BOTH ends of the bus. Cannot be moved — if terminating at different device, fully remove connector with resistor."
+          "CAN bus terminating resistor: must be at BOTH ends of the bus. Cannot be moved â€” if terminating at different device, fully remove connector with resistor."
         ],
         "internal_notes": "Table 5-1 (page 32). Control circuit = CAN bus wiring. Wire color standard: red=24V+, black=GND, orange=CTRL+, blue=CTRL-. Figure 5-2 (021007): inverter control circuit terminal sets. Figure 5-3 (021009): battery control circuit terminal sets (port B has two sets, use both for daisy-chain). Battery terminals are labeled STATUS LED/DISCONNECT, PORT A, PORT B, 24V+, GND, CTRL-, CTRL."
       }
@@ -641,43 +693,406 @@
       "device": "BMU",
       "friendly_name": "Battery Internal Cat 5 COMM Cable Wiring",
       "alarm_type": "installation_procedure",
-      "sources": ["battery_a0008210367_installmanual_page33_screenshot"],
+      "sources": [
+        "battery_a0008210367_installmanual_page33_screenshot"
+      ],
       "engineering": {
-        "description": "Internal battery module communication (COMM) cable connections using Cat 5 cables. These cables connect battery modules to each other INSIDE the battery cabinet. This is NOT the same as CAN bus — CAN bus connects the battery to the inverter and SDS externally.",
+        "description": "Internal battery module communication (COMM) cable connections using Cat 5 cables. These cables connect battery modules to each other INSIDE the battery cabinet. This is NOT the same as CAN bus â€” CAN bus connects the battery to the inverter and SDS externally.",
         "trigger": "Missing or incorrectly routed COMM cables cause individual battery modules to show as offline or not communicating, even though the battery cabinet itself is powered and connected.",
         "troubleshooting": [
-          "IMPORTANT: Battery module COMM cables use Cat 5 (RJ45) connectors INSIDE the cabinet only. This is internal module-to-module communication — do NOT confuse with CAN bus.",
+          "IMPORTANT: Battery module COMM cables use Cat 5 (RJ45) connectors INSIDE the cabinet only. This is internal module-to-module communication â€” do NOT confuse with CAN bus.",
           "Cable types: A=Black Cat 5 jumper cables (module-to-module on same shelf). B=Gray Cat 5 (MOD COMM, from cabinet harness). C=Blue Cat 5. D=Orange Cat 5. E=Purple Cat 5 (MOD COMM).",
           "Four multicolored Cat 5 cables are factory-installed in the battery cabinet and attached to the battery power cable harness in the right-hand wiring channel.",
           "Three black Cat 5 jumper cables are shipped loose in the hardware kit.",
-          "Step 1 — Connect gray Cat 5 cable (G/B) to top-most back module COMM IN port.",
-          "Step 2 — Connect purple Cat 5 cable (K/E) to bottom-most front module COMM Out port. NOTE: for less than 6 modules, connect K to COMM Out of bottom-most battery module.",
-          "Step 3 — Connect blue Cat 5 cable (H/C) and orange Cat 5 cable (J/D) as shown in Figure 5-5.",
-          "Step 4 — Connect black jumper cables (F/A) between battery modules on the same shelf.",
-          "Step 5 — Verify connections create continuous circuit from gray cable through all modules using black jumpers, blue and orange cables, ending at purple cable.",
+          "Step 1 â€” Connect gray Cat 5 cable (G/B) to top-most back module COMM IN port.",
+          "Step 2 â€” Connect purple Cat 5 cable (K/E) to bottom-most front module COMM Out port. NOTE: for less than 6 modules, connect K to COMM Out of bottom-most battery module.",
+          "Step 3 â€” Connect blue Cat 5 cable (H/C) and orange Cat 5 cable (J/D) as shown in Figure 5-5.",
+          "Step 4 â€” Connect black jumper cables (F/A) between battery modules on the same shelf.",
+          "Step 5 â€” Verify connections create continuous circuit from gray cable through all modules using black jumpers, blue and orange cables, ending at purple cable.",
           "When two modules are on the bottom shelf: install purple cable (K) in the front module."
         ],
-        "internal_notes": "Figure 5-4 (021010): battery module connections and LEDs (A=Status LED, B=SOC LED, C=COMM In, D=COMM Out, E=Battery Power Port). Figure 5-5 (021011): COMM cable routing diagram. NEVER reach into or touch battery terminals — high voltage. The Cat 5 COMM cables carry only low-voltage module status and SOC data between modules — they are safe to handle when battery is de-energized."
+        "internal_notes": "Figure 5-4 (021010): battery module connections and LEDs (A=Status LED, B=SOC LED, C=COMM In, D=COMM Out, E=Battery Power Port). Figure 5-5 (021011): COMM cable routing diagram. NEVER reach into or touch battery terminals â€” high voltage. The Cat 5 COMM cables carry only low-voltage module status and SOC data between modules â€” they are safe to handle when battery is de-energized."
       }
-    }
-  ,
+    },
     {
       "id": "procedure.bmu.power_cables_and_cover",
       "alarm_name": "Battery Module Power Cable Connections and Cover Installation",
       "device": "BMU",
       "friendly_name": "Battery Power Cable Wiring and Cabinet Cover",
       "alarm_type": "installation_procedure",
-      "sources": ["battery_a0008210367_installmanual_page34_screenshot"],
+      "sources": [
+        "battery_a0008210367_installmanual_page34_screenshot"
+      ],
       "engineering": {
-        "description": "Procedure for connecting battery module power cables and installing the battery cabinet front cover. Power cables carry high voltage DC — never touch terminals with hands or tools.",
+        "description": "Procedure for connecting battery module power cables and installing the battery cabinet front cover. Power cables carry high voltage DC â€” never touch terminals with hands or tools.",
         "troubleshooting": [
-          "Module power cable connections: remove gray rubber cap (M) from each module power port (L). Plug black power cable connectors (N) into the uncapped battery module port ports (L). Install a loop jumper (P) on each UNUSED power cable connector (Q) — unused connectors must always be capped with loop jumpers.",
+          "Module power cable connections: remove gray rubber cap (M) from each module power port (L). Plug black power cable connectors (N) into the uncapped battery module port ports (L). Install a loop jumper (P) on each UNUSED power cable connector (Q) â€” unused connectors must always be capped with loop jumpers.",
           "Cover installation: using built-in orange handles (A), lift cover and tilt slightly forward in front of battery cabinet. Verify all cables are tucked in and clear of cabinet frame. Rest top interior of cover on back flange and align sides. In a slow and controlled manner, let cover swing toward cabinet. Fasten the two cover side screws (B) to secure cover.",
           "Cover removal: loosen the two cover side screws (B). Using built-in orange handles (A), lift cover and swing out.",
-          "DANGER: Never reach into or touch battery terminals with hands or tools — high voltage DC present. Always de-energize by turning off the Battery Disconnect Switch before any work inside the cabinet."
+          "DANGER: Never reach into or touch battery terminals with hands or tools â€” high voltage DC present. Always de-energize by turning off the Battery Disconnect Switch before any work inside the cabinet."
         ],
-        "internal_notes": "Figure 5-6 (021012): remove rubber caps and connect power cable connectors. Figure 5-7 (021013): loop jumper on unused power connectors. Figure 5-8 (021014, 021015): cover installation. Loop jumpers MUST be installed on all unused power cable connectors — this is a safety requirement. Orange handles are built into the cover for lifting."
+        "internal_notes": "Figure 5-6 (021012): remove rubber caps and connect power cable connectors. Figure 5-7 (021013): loop jumper on unused power connectors. Figure 5-8 (021014, 021015): cover installation. Loop jumpers MUST be installed on all unused power cable connectors â€” this is a safety requirement. Orange handles are built into the cover for lifting."
       }
+    },
+    {
+      "id": "procedure.fieldpro.commissioning_overview",
+      "alarm_name": "Field Pro App — Commissioning Overview",
+      "device": "PWRcell 2 / PWRmicro",
+      "friendly_name": "Field Pro Commissioning Steps",
+      "alarm_type": "commissioning_procedure",
+      "sources": [
+        "neurio/installer-app docs/agent/customer_journeys"
+      ],
+      "engineering": {
+        "description": "Field Pro is Generac's mobile app (iOS/Android) used by installers to commission PWRcell 2 and PWRmicro systems. All commissioning happens over a local Wi-Fi connection from the phone to the gateway inside the SDS (PWRcell 2) or Smart Combiner (PWRmicro).",
+        "troubleshooting": [
+          "Launch Field Pro and select 'Work on Solar and Storage' on the system landing screen.",
+          "Create a new site or search for an existing site (enter owner name, address, utility provider).",
+          "Connect to the gateway: scan the QR code on the SDS (PWRcell 2) or Smart Combiner (PWRmicro), enter Wi-Fi credentials. The phone joins the gateway's local Wi-Fi network.",
+          "Optional: configure cloud connectivity (Wi-Fi, Ethernet, or Cellular) so the gateway can reach Generac cloud for remote monitoring.",
+          "Device Manager: review discovered devices (inverter, battery, SDS), add any manually-added devices (third-party AC PV, generator), verify list and Save.",
+          "Firmware: if any device is not on latest firmware, update before proceeding.",
+          "Configuration: complete all required configuration screens (SDS, Metering, Grid Settings, PCS, Storage).",
+          "System Test: run self-tests. All must pass before commissioning can complete.",
+          "Complete Commissioning: registers devices, activates warranties, generates grid compliance and commissioning reports, enables the system.",
+          "Post-Commissioning: download reports, grant PTO (Permission to Operate), upload site photos."
+        ],
+        "internal_notes": "PWRcell 2 gateway is inside the SDS. PWRmicro standalone gateway is inside the Smart Combiner. In combined systems, only the SDS gateway is active — the Smart Combiner gateway is powered off."
+      },
+      "tags": [
+        "field-pro",
+        "commissioning",
+        "app",
+        "workflow"
+      ]
+    },
+    {
+      "id": "procedure.fieldpro.pwrcell2_commissioning_steps",
+      "alarm_name": "Field Pro — PWRcell 2 Configuration Steps in Order",
+      "device": "PWRcell 2",
+      "friendly_name": "PWRcell 2 Commissioning Step Sequence",
+      "alarm_type": "commissioning_procedure",
+      "sources": [
+        "neurio/installer-app CommissioningStepKey.ts",
+        "commissioning-flows.md"
+      ],
+      "engineering": {
+        "description": "PWRcell 2 commissioning has 8 required steps that must all be completed in order. The configuration menu groups steps 2-6. Steps cannot be skipped; the system test cannot run until all configuration steps are complete.",
+        "troubleshooting": [
+          "Step 1 — Device List (DEVICE_LIST): Open Device Manager, confirm all discovered devices appear (SDS, Inverter, Battery), save. Firmware update prompt appears here if needed.",
+          "Step 2 — SDS Configuration (SDS): Set SDS location (Service Entrance or Non-Service Entrance) and OCPD breaker rating(s). Saves system configuration to the gateway.",
+          "Step 3 — Metering (METERING): Configure CT placement (Grid Net / Loads / Net Load / Loads Only). For Non-Service Entrance, external CTs are required. Run metering validation (compare to utility meter, turn on a known load, verify reading increased).",
+          "Step 4 — Grid Compliance (GRID_COMPLIANCE): Select grid profile for AHJ jurisdiction. Enable site export limit if utility requires it (only available when External CTs are configured).",
+          "Step 5 — PCS Settings (PCS_SETTINGS): Configure Power Control System mode (BBOC, FCOC, or Backfeed Limit). This step is DISABLED until SDS is saved. Enabling PCS shows a safety confirmation dialog.",
+          "Step 6 — Storage (STORAGE): Set backup reserve % (default 20%), enable/disable grid charging and grid discharging (export), set ESS export limit if applicable.",
+          "Step 7 — System Self-Test (SELF_TEST): Navigate to 'System test' row on Commissioning Home. Start tests. All device tests and system tests must pass. Failed tests show troubleshooting steps. Timed out tests (30s) indicate a device is offline.",
+          "Step 8 — Complete Commissioning: Set PTO status (storage and solar), click 'Complete commissioning and enable'. System resets SDS, enables inverter and battery, registers devices, generates reports."
+        ],
+        "internal_notes": "SDS step invalidates METERING and PCS_SETTINGS if re-saved. METERING invalidates PCS_SETTINGS if re-saved. PCS_SETTINGS guard: disabled until SDS or GMS step is completed. Optional steps: AC-coupled PV (ACCPV), AC Generator (ACGEN) — only shown if those devices are added in Device Manager."
+      },
+      "tags": [
+        "field-pro",
+        "commissioning",
+        "pwrcell2",
+        "steps",
+        "configuration"
+      ]
+    },
+    {
+      "id": "procedure.fieldpro.pwrmicro_commissioning_steps",
+      "alarm_name": "Field Pro — PWRmicro Commissioning Steps",
+      "device": "PWRmicro",
+      "friendly_name": "PWRmicro-Only Commissioning Sequence",
+      "alarm_type": "commissioning_procedure",
+      "sources": [
+        "neurio/installer-app docs/agent/customer_journeys/commissioning_pwrmicro.md"
+      ],
+      "engineering": {
+        "description": "Standalone PWRmicro commissioning (no PWRcell 2 battery/inverter) has a shorter configuration flow. The Smart Combiner is the gateway device. Micro-inverters are discovered and bound to the Smart Combiner during device save.",
+        "troubleshooting": [
+          "Connect to Smart Combiner gateway by scanning QR code on the Smart Combiner.",
+          "MI nighttime mode is automatically enabled by the gateway firmware when the app connects — micro-inverters that normally sleep at night become discoverable. App disables nighttime mode when commissioning completes.",
+          "Device Manager: verify Smart Combiner and all micro-inverters appear. After saving, a binding spinner shows progress as the Smart Combiner pairs with each MI.",
+          "After binding completes, user is prompted to upload an array layout image (recommended but not required).",
+          "Configuration menu is shorter than PWRcell 2 — only: GMS (if present), Metering, Grid Settings.",
+          "No SDS, PCS, Storage, or AC-coupled PV steps — these are hidden for PWRmicro.",
+          "System self-test: run device tests. No 'Disabling system' step because there is no inverter or battery to disable.",
+          "PWRmicro is solar-only — no grid disconnect option. PTO is solar PTO only."
+        ],
+        "internal_notes": "Required commissioning steps for PWRmicro: DEVICE_LIST, METERING, GRID_COMPLIANCE, SELF_TEST, COMPLETE_COMMISSIONING. MI firmware updates are deferred — PLCHE handles them asynchronously after commissioning completes. Field Pro does not wait."
+      },
+      "tags": [
+        "field-pro",
+        "commissioning",
+        "pwrmicro",
+        "binding",
+        "smart-combiner"
+      ]
+    },
+    {
+      "id": "troubleshoot.fieldpro.gateway_connection",
+      "alarm_name": "Field Pro — Gateway Connection Troubleshooting",
+      "device": "Gateway (SDS or Smart Combiner)",
+      "friendly_name": "Cannot Connect to Gateway in Field Pro",
+      "alarm_type": "troubleshooting",
+      "sources": [
+        "neurio/installer-app docs/agent/customer_journeys/troubleshooting_solar_storage.md"
+      ],
+      "engineering": {
+        "description": "Field Pro connects to the gateway via local Wi-Fi (15s timeout) then establishes an MQTT session (15s timeout). Either step can fail. The app shows a connection failure modal with Retry and Edit Credentials options.",
+        "troubleshooting": [
+          "Wrong password — check the credentials on the QR code label on the SDS or Smart Combiner. Re-scan or manually re-enter.",
+          "No networks found — verify the gateway is powered on and the phone's Wi-Fi is enabled.",
+          "IP address assignment failed — phone connected to gateway Wi-Fi but DHCP failed. Move closer to the gateway and retry.",
+          "Association rejected — gateway refused the connection. Power cycle the SDS or Smart Combiner and retry.",
+          "Unsupported security type — rare, indicates a phone OS or gateway firmware mismatch. Try a different phone.",
+          "MQTT connection error (Wi-Fi succeeded, MQTT failed) — gateway software may still be starting up after a reboot. Wait 30 seconds and retry.",
+          "Wi-Fi connected but commissioning disconnects mid-session — app shows 'Connection Lost' modal. Use Reconnect to re-establish automatically, or 'Go to Dashboard' to exit.",
+          "Connection lost modal is suppressed during gateway reboots (firmware updates) — this is expected behavior.",
+          "Wrong site error: 'The connected gateway is already bound to a different site' — verify you selected the correct site in Field Pro."
+        ],
+        "internal_notes": "Wi-Fi timeout: 15 seconds. MQTT timeout: 15 seconds. Troubleshooting tips shown in app: Is Wi-Fi enabled on phone? Are you close enough to the gateway? Is the gateway powered on?"
+      },
+      "tags": [
+        "field-pro",
+        "gateway",
+        "wifi",
+        "mqtt",
+        "connection",
+        "troubleshooting"
+      ]
+    },
+    {
+      "id": "troubleshoot.fieldpro.firmware_update",
+      "alarm_name": "Field Pro — Firmware Update Troubleshooting",
+      "device": "PWRcell 2 / PWRmicro",
+      "friendly_name": "Firmware Update Failures in Field Pro",
+      "alarm_type": "troubleshooting",
+      "sources": [
+        "neurio/installer-app docs/agent/customer_journeys/troubleshooting_solar_storage.md",
+        "docs/agent/screens/system_software_screen.md"
+      ],
+      "engineering": {
+        "description": "Firmware updates are required before configuration if devices are not on latest firmware. The app shows a 'Firmware update available' modal on device save. Process: File Transfer → Apply → Reboot → Verify.",
+        "troubleshooting": [
+          "File transfer timeout — firmware file did not finish uploading. Stay close to gateway (within a few feet), retry. Transfer progress shows percentage.",
+          "Apply failure — device rejected or failed to install firmware. Check device is online and communicating, retry.",
+          "Reboot/reconnection failure — after device reboots, app tries to reconnect 4 times (first attempt waits 120s, later attempts wait 60s each). If all fail, app falls back to offline mode. Reconnect manually to gateway and retry.",
+          "Verification failure — device rebooted but not running expected firmware version. Retry the update.",
+          "During gateway reboot, connection lost modal is suppressed (expected). App shows 'Rebooting Gateway. During reboot you will lose connection. Attempting to reconnect in N seconds.'",
+          "Firmware can also be updated from Generac cloud (PWRfleet) but only works well with Wi-Fi or Ethernet due to large file sizes — LTE is too slow.",
+          "Micro-inverter (MI) firmware is always deferred — PLCHE (Smart Combiner controller) handles MI updates asynchronously after commissioning. Field Pro does not wait for MI firmware updates."
+        ],
+        "internal_notes": "App shows firmware update screen via Device Manager > System Software. Gateway always listed first in device list. PWRmicros grouped as 'PWRmicros (N)' when multiple."
+      },
+      "tags": [
+        "field-pro",
+        "firmware",
+        "update",
+        "reboot",
+        "troubleshooting"
+      ]
+    },
+    {
+      "id": "troubleshoot.fieldpro.system_test",
+      "alarm_name": "Field Pro — System Self-Test Troubleshooting",
+      "device": "PWRcell 2",
+      "friendly_name": "System Self-Test Failures and Timeouts",
+      "alarm_type": "troubleshooting",
+      "sources": [
+        "neurio/installer-app docs/agent/customer_journeys/troubleshooting_solar_storage.md",
+        "SelfTestScreen.i18n.ts"
+      ],
+      "engineering": {
+        "description": "System tests verify communication between components, metering accuracy, and proper operation. Before tests run, the inverter and battery are disabled ('Disabling system'). Tests run on both individual devices and system-level. All must pass to complete commissioning.",
+        "troubleshooting": [
+          "Test list request timeout (5s) — gateway did not respond with available tests. Check gateway connection and retry.",
+          "Test execution timeout (30s) — a test started but did not complete. Indicates a device is offline or not communicating. Verify all devices show as online in Device Manager, check CAN bus wiring connections (SDS ↔ Inverter ↔ Battery). Retry.",
+          "Individual test failure — specific test returned a failing result (e.g., incorrect DC-Link voltage, communication failure). App shows failure details with troubleshooting steps for each failed test. Review and fix the indicated issue, then restart tests.",
+          "Self-test cannot run — check all required configuration steps are completed: METERING, GRID_COMPLIANCE, PCS_SETTINGS, STORAGE, and SDS/GMS (plus ACCPV and ACGEN if those devices are in the system).",
+          "System test times out with battery offline — see 'Battery offline during commissioning' troubleshooting. Use Enable ESS to restore power, then retry tests.",
+          "After re-running self-tests: if a configuration change was saved after the first test pass, commissioning status resets. Re-run tests and pass them again.",
+          "Test status states: NOT_STARTED, IN_PROGRESS, COMPLETED (pass), WARNING (pass with caveats), ERROR (fail — blocks commissioning completion)."
+        ],
+        "internal_notes": "Self-test readiness requirements: PWRCELL needs METERING + GRID_COMPLIANCE + PCS_SETTINGS + STORAGE + SDS/GMS (+ ACCPV if AC PV, + ACGEN if generator). PWRMICRO needs METERING + GRID_COMPLIANCE (+ GMS if GMS device). Clear alarms test name: 'Clear alarms'. After tests pass: navigates to SelfTestPassedScreen for PTO and final commissioning."
+      },
+      "tags": [
+        "field-pro",
+        "self-test",
+        "system-test",
+        "troubleshooting",
+        "commissioning"
+      ]
+    },
+    {
+      "id": "troubleshoot.fieldpro.battery_offline_during_commissioning",
+      "alarm_name": "Field Pro — Battery Offline / Not Detected During Commissioning",
+      "device": "Battery (PWRcell 2)",
+      "friendly_name": "Battery Not Found or Goes Offline During Commissioning",
+      "alarm_type": "troubleshooting",
+      "sources": [
+        "neurio/installer-app docs/agent/customer_journeys/troubleshooting_solar_storage.md",
+        "DeviceManagementScreen.i18n.ts"
+      ],
+      "engineering": {
+        "description": "During commissioning, the inverter and battery are powered off to prevent unsafe operation. If commissioning takes too long (~1 hour), batteries may enter deep sleep. They appear offline or not detected in Device Manager.",
+        "troubleshooting": [
+          "Battery not found toast: 'Please make sure the battery is connected and powered on.' — check CAN bus and power cable connections.",
+          "Battery goes offline after ~1 hour of commissioning — battery entered deep sleep because it received no power from the inverter (intentionally blocked during commissioning).",
+          "Resolution: Use 'Enable ESS' option on Device Management screen. This temporarily restores power from inverter to battery.",
+          "Enable ESS confirmation dialog — installer must confirm: (1) pre-commissioning checks completed, (2) equipment dead fronts and front covers installed, (3) all persons have hands free from equipment.",
+          "After tapping Enable ESS: app waits up to 30 seconds for battery to come online. Once detected, continue commissioning normally.",
+          "If commissioning was interrupted (app closed, phone disconnected, connection lost before self-tests passed) — system remains power-blocked. Re-connect to gateway, use Enable ESS if battery is offline, then re-run self-tests.",
+          "Inverter shows 'waiting' status — expected during commissioning. System blocks power conversion until self-tests pass. Complete commissioning to resolve.",
+          "Battery not in System Devices list but visible in Available Devices — add battery to system and save."
+        ],
+        "internal_notes": "Enable ESS modal appears automatically when device list has inverter but no online batteries. This is the recovery path for deep-sleep batteries. Also the fallback if commissioning is interrupted."
+      },
+      "tags": [
+        "field-pro",
+        "battery",
+        "offline",
+        "commissioning",
+        "enable-ess",
+        "troubleshooting"
+      ]
+    },
+    {
+      "id": "troubleshoot.fieldpro.metering_ct",
+      "alarm_name": "Field Pro — Metering / CT Configuration Troubleshooting",
+      "device": "SDS / PWRmicro Smart Combiner",
+      "friendly_name": "CT Metering Errors and Validation Failures",
+      "alarm_type": "troubleshooting",
+      "sources": [
+        "neurio/installer-app MeteringScreen.i18n.ts",
+        "MeteringValidationScreen.i18n.ts",
+        "metering_configuration_screen.md",
+        "metering_validation_screen.md"
+      ],
+      "engineering": {
+        "description": "Metering validation confirms current transformers (CTs) are correctly installed and measuring real power. The app runs a 3-step validation: compare to utility meter → turn on a known load → verify reading increased.",
+        "troubleshooting": [
+          "CT reading does not match utility meter — check CT configuration mode: use 'Service conductors' (Grid Net) if CTs clamp around service entrance conductors including SDS, use 'Branch circuit conductors' (Loads) if CTs only capture remaining non-backup loads.",
+          "L1 CT and L2 CT may be swapped — ensure L1 CT is on the L1 line and L2 CT is on the L2 line.",
+          "CT orientation backwards — negative Consumption or Solar value in live measurements. App flags affected channel with error. Re-open the CT clamp, flip it 180°, and re-clamp around the conductor.",
+          "CT not fully closed — reading will be low or erratic. Ensure CT clamp is completely closed around conductor.",
+          "Load bundling error — if bundling multiple conductors through one CT, ensure all relevant cables pass through (important for subpanel feeders).",
+          "Grid reading decreased when load turned on (expected to increase) — CT is backwards. Flip CT orientation on the affected channel.",
+          "Grid reading did not change when load turned on — CT may not be clamped around the correct conductor, or CT is not connected. Verify CT placement and cable connections at SDS.",
+          "Metering validation not required message — service entrance installations (SDS at service entrance) do not need external CTs. This is expected.",
+          "For PWRmicro: configure Smart Combiner location (Line-side or Load-side). Visual diagrams shown in app. Incorrect selection causes inaccurate metering."
+        ],
+        "internal_notes": "CT configuration modes: Grid Net (Service conductors) = CTs at main service entrance including SDS. Loads = CTs on remaining non-backup loads in main service panel, not including SDS. Net Load (Loads and Solar) = combined load + PV. Loads Only = load only, no solar sensing."
+      },
+      "tags": [
+        "field-pro",
+        "metering",
+        "ct",
+        "current-transformer",
+        "validation",
+        "troubleshooting"
+      ]
+    },
+    {
+      "id": "troubleshoot.fieldpro.sds_config_errors",
+      "alarm_name": "Field Pro — SDS Configuration Errors",
+      "device": "SDS",
+      "friendly_name": "SDS Configuration Screen Errors and Validation",
+      "alarm_type": "troubleshooting",
+      "sources": [
+        "neurio/installer-app SDSConfigScreen.i18n.ts",
+        "sds_configuration_screen.md"
+      ],
+      "engineering": {
+        "description": "The SDS configuration screen sets the SDS location (Service Entrance or Non-Service Entrance) and OCPD ratings. These values drive PCS settings and circuit protection. Errors in OCPD values are a serious safety concern.",
+        "troubleshooting": [
+          "Select SDS location — 'Service Entrance' if no upstream loads or power sources exist. 'Non-Service Entrance' if upstream loads or power sources exist.",
+          "Service Entrance only requires SDS Main Breaker rating. Select the breaker rating that matches the installed hardware.",
+          "Non-Service Entrance requires: Main Service OCPD, SDS Feeder OCPD, and optionally Uncontrolled Sources OCPD (if other loads/sources exist in the main panel).",
+          "Main Service OCPD must be >= SDS Feeder OCPD.",
+          "Maximum Main Service OCPD without a feeder breaker: 200A (SDS busbar limit). Error: 'Main service OCPD must not exceed 200A, which is the maximum rating of the SDS busbar.'",
+          "Save error 'Settings could not be configured due to a communication error' — check Wi-Fi connection to gateway. Reconnect if needed.",
+          "SDS settings are LOCKED after commissioning completes. To change SDS settings after commissioning, contact Generac Support.",
+          "No loads confirmation dialog: 'Please confirm no loads or sources will be installed in the Main Service Panel.' Must label the panel per NEC — dealer responsibility.",
+          "Uncontrolled Sources OCPD warning: 'Consumption monitoring is not available with additional PV.'"
+        ],
+        "internal_notes": "Saving SDS step invalidates METERING and PCS_SETTINGS (resets them to NOT_STARTED). SDS location 'service entrance' = supply side. 'Non-service entrance' = load side. After SDS save, PCS_SETTINGS step becomes enabled."
+      },
+      "tags": [
+        "field-pro",
+        "sds",
+        "ocpd",
+        "service-entrance",
+        "configuration",
+        "troubleshooting"
+      ]
+    },
+    {
+      "id": "troubleshoot.fieldpro.commissioning_status_reset",
+      "alarm_name": "Field Pro — Commissioning Status Resets or Appears Incomplete",
+      "device": "PWRcell 2 / PWRmicro",
+      "friendly_name": "Commissioning Shows Incomplete After Previously Completing",
+      "alarm_type": "troubleshooting",
+      "sources": [
+        "neurio/installer-app docs/agent/customer_journeys/troubleshooting_solar_storage.md"
+      ],
+      "engineering": {
+        "description": "Saving any configuration change after self-tests have passed resets the commissioning status to 'Equipment Added' in PWRfleet. The app may still show a checkmark from cached results. This is by design — configuration changes invalidate self-test results.",
+        "troubleshooting": [
+          "Site appears uncommissioned in PWRfleet after commissioning was marked complete — a configuration change was saved after self-tests passed. Re-run self-tests and pass them again.",
+          "App still shows checkmark but PWRfleet shows 'Equipment Added' — app is showing cached results. Re-run self-tests.",
+          "Cannot re-run self-tests remotely — site visit required. If correction needed without a site visit, contact Generac support to restore commissioning status.",
+          "Commissioning interrupted mid-way — system remains in power-blocked state. Reconnect to gateway, use Enable ESS if battery offline, re-run from last incomplete step.",
+          "Step dependencies: saving SDS resets METERING and PCS_SETTINGS. Saving METERING resets PCS_SETTINGS. These steps must be re-completed after any SDS or metering change.",
+          "Grid profile data not downloaded — profiles unavailable for selection. Disconnect from gateway, ensure phone has internet, reopen app to trigger profile download, then reconnect."
+        ],
+        "internal_notes": "Step invalidation map: SDS → METERING + PCS_SETTINGS. METERING → PCS_SETTINGS. No other step triggers invalidation. CommissioningStatusState values: NOT_STARTED, IN_PROGRESS, COMPLETED, WARNING, ERROR."
+      },
+      "tags": [
+        "field-pro",
+        "commissioning",
+        "status",
+        "reset",
+        "pwrfleet",
+        "troubleshooting"
+      ]
+    },
+    {
+      "id": "procedure.fieldpro.complete_commissioning",
+      "alarm_name": "Field Pro — Complete Commissioning and Post-Commissioning Steps",
+      "device": "PWRcell 2 / PWRmicro",
+      "friendly_name": "Complete Commissioning Screen and Post-Commissioning",
+      "alarm_type": "commissioning_procedure",
+      "sources": [
+        "neurio/installer-app CompleteCommissioningScreen.i18n.ts",
+        "SelfTestPassedScreen.i18n.ts",
+        "complete_commissioning_screen.md",
+        "self_test_passed_screen.md"
+      ],
+      "engineering": {
+        "description": "After all system tests pass, the installer reaches the Self Test Passed screen to complete commissioning. This triggers device registration, warranty activation, report generation, and system enable. PTO (Permission to Operate) is set here.",
+        "troubleshooting": [
+          "Self Test Passed screen — set PTO status: Storage PTO (battery export to grid) and Solar PTO (solar production enabled). PTO can also be set later from the Activation screen (Post-Commissioning) or remotely via PWRfleet.",
+          "Tap 'Complete commissioning and enable' — triggers final workflow: resets SDS, enables inverter and battery, activates warranties, generates commissioning and grid compliance reports. Takes several minutes.",
+          "Connectivity warning banner — if Wi-Fi/Ethernet not configured, shown as 'Connectivity configuration skipped'. Installer can configure now or instruct homeowner to use PWRview app.",
+          "Error: 'Device failed to enable' (deviceModeError) — failed to enable inverter or battery. Retry 'Complete commissioning'. If persists, contact Generac Support.",
+          "Error: 'SDS reset failed' (resetSdsError) — SDS reboot failed during commissioning. Retry.",
+          "Error: 'SDS reboot timeout' (sdsBootError) — SDS is taking too long to reboot. Check SDS power and CAN bus connections.",
+          "Registration error: 'The system was successfully commissioned, but couldn't connect to the internet to complete registration' — internet connectivity issue on gateway. Call Generac Support with the gateway serial number (printed on QR label on dead front). Warranties can be activated remotely.",
+          "Before leaving site: (1) Download DER settings report from Post-Commissioning menu. (2) Configure connectivity if not done. (3) Perform system walkthrough with homeowner.",
+          "Post-Commissioning menu: Download grid report, download commissioning report, grant/update PTO, upload site images, connect/disconnect from grid (PWRcell 2 only — PWRmicro grid disconnect is disabled)."
+        ],
+        "internal_notes": "Commissioning complete workflow: reset SDS → enable devices → activate warranties (requires internet) → generate reports. If no internet: registration fails but commissioning is saved. Gateway serial number = penguinGuid, printed on dead front QR label."
+      },
+      "tags": [
+        "field-pro",
+        "pto",
+        "commissioning",
+        "complete",
+        "registration",
+        "warranty",
+        "post-commissioning"
+      ]
     }
   ]
 }
