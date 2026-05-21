@@ -111,6 +111,22 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Sego
 .send-btn:hover:not(:disabled) { background: var(--orange-light); }
 .send-btn:disabled { background: var(--dark-3); color: var(--text-dimmer); cursor: not-allowed; }
 
+.tool-btn { background: transparent; border: none; color: var(--text-dimmer); width: 34px; height: 34px; border-radius: 7px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
+.tool-btn:hover { color: var(--text); background: rgba(255,255,255,0.06); }
+.tool-btn.recording { color: #ef4444; animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+/* Image preview bar */
+.image-preview-bar { display: flex; gap: 8px; padding: 8px 0 4px; flex-wrap: wrap; }
+.img-preview-wrap { position: relative; }
+.img-preview-thumb { width: 56px; height: 56px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); }
+.img-preview-remove { position: absolute; top: -6px; right: -6px; width: 18px; height: 18px; border-radius: 50%; background: #ef4444; border: none; color: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; }
+
+/* Images in messages */
+.message-images { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.message-image { max-width: 240px; max-height: 180px; border-radius: 6px; border: 1px solid var(--border); object-fit: cover; cursor: pointer; }
+.message-image:hover { opacity: 0.9; }
+
 .input-hint { font-size: 11px; color: var(--text-dimmer); margin-top: 6px; }
 
 /* Feedback bar */

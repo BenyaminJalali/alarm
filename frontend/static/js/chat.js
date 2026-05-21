@@ -4,20 +4,23 @@
   const sendBtn = document.getElementById("sendBtn");
   const newChatBtn = document.getElementById("newChatBtn");
   const kbStatus = document.getElementById("kbStatus");
+  const imageBtn = document.getElementById("imageBtn");
+  const imageInput = document.getElementById("imageInput");
+  const micBtn = document.getElementById("micBtn");
+  const imagePreviewBar = document.getElementById("imagePreviewBar");
 
   let history = [];
   let currentRole = "installer";
   let isStreaming = false;
+  let pendingImages = []; // { dataUrl, mimeType, filename }
+  let recognition = null;
+  let isRecording = false;
 
   // ── KB status ──────────────────────────────────────────────────────────────
   fetch("/api/health")
     .then((r) => r.json())
-    .then((d) => {
-      kbStatus.textContent = `KB: ${d.kb_entries} alarms loaded`;
-    })
-    .catch(() => {
-      kbStatus.textContent = "KB: offline";
-    });
+    .then((d) => { kbStatus.textContent = `KB: ${d.kb_entries} alarms loaded`; })
+    .catch(() => { kbStatus.textContent = "KB: offline"; });
 
   // ── Role selection ─────────────────────────────────────────────────────────
   document.querySelectorAll(".role-btn").forEach((btn) => {
@@ -40,16 +43,16 @@
   // ── New chat ───────────────────────────────────────────────────────────────
   newChatBtn.addEventListener("click", () => {
     history = [];
+    pendingImages = [];
     messagesEl.innerHTML = "";
-    appendMessage(
-      "assistant",
-      "New conversation started. Describe a fault, alarm code, or symptom to begin."
-    );
+    imagePreviewBar.innerHTML = "";
+    imagePreviewBar.style.display = "none";
+    appendMessage("assistant", "New conversation started. Describe a fault, alarm code, or symptom to begin.");
   });
 
   // ── Input handling ─────────────────────────────────────────────────────────
   inputEl.addEventListener("input", () => {
-    sendBtn.disabled = !inputEl.value.trim() || isStreaming;
+    sendBtn.disabled = (!inputEl.value.trim() && pendingImages.length === 0) || isStreaming;
     autoResize();
   });
 
@@ -67,18 +70,171 @@
     inputEl.style.height = Math.min(inputEl.scrollHeight, 160) + "px";
   }
 
+  // ── Image handling ─────────────────────────────────────────────────────────
+  imageBtn.addEventListener("click", () => imageInput.click());
+
+  imageInput.addEventListener("change", async () => {
+    const files = Array.from(imageInput.files);
+    for (const file of files) {
+      const compressed = await compressImage(file, 3.5 * 1024 * 1024); // 3.5MB max
+      pendingImages.push(compressed);
+    }
+    imageInput.value = "";
+    renderImagePreviews();
+    sendBtn.disabled = isStreaming;
+  });
+
+  function renderImagePreviews() {
+    imagePreviewBar.innerHTML = "";
+    if (pendingImages.length === 0) {
+      imagePreviewBar.style.display = "none";
+      return;
+    }
+    imagePreviewBar.style.display = "flex";
+    pendingImages.forEach((img, i) => {
+      const wrap = document.createElement("div");
+      wrap.className = "img-preview-wrap";
+      wrap.innerHTML = `
+        <img src="${img.dataUrl}" class="img-preview-thumb" />
+        <button class="img-preview-remove" data-i="${i}">×</button>
+      `;
+      imagePreviewBar.appendChild(wrap);
+    });
+    imagePreviewBar.querySelectorAll(".img-preview-remove").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        pendingImages.splice(parseInt(btn.dataset.i), 1);
+        renderImagePreviews();
+        if (pendingImages.length === 0 && !inputEl.value.trim()) {
+          sendBtn.disabled = true;
+        }
+      });
+    });
+  }
+
+  async function compressImage(file, maxBytes) {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          let w = img.width, h = img.height;
+          // Scale down if needed
+          const maxDim = 1920;
+          if (w > maxDim || h > maxDim) {
+            if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+            else { w = Math.round(w * maxDim / h); h = maxDim; }
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = w; canvas.height = h;
+          canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+
+          // Try quality 0.85 first, reduce if still too big
+          let quality = 0.85;
+          let dataUrl = canvas.toDataURL("image/jpeg", quality);
+          while (dataUrl.length * 0.75 > maxBytes && quality > 0.3) {
+            quality -= 0.1;
+            dataUrl = canvas.toDataURL("image/jpeg", quality);
+          }
+          resolve({ dataUrl, mimeType: "image/jpeg", filename: file.name });
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // ── Voice handling ─────────────────────────────────────────────────────────
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if (!SpeechRecognition) {
+    micBtn.style.display = "none";
+  } else {
+    recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = true;
+    recognition.lang = "en-US";
+
+    let finalTranscript = "";
+
+    recognition.onstart = () => {
+      isRecording = true;
+      micBtn.classList.add("recording");
+      micBtn.title = "Tap to stop";
+    };
+
+    recognition.onresult = (e) => {
+      let interim = "";
+      finalTranscript = "";
+      for (let i = 0; i < e.results.length; i++) {
+        if (e.results[i].isFinal) finalTranscript += e.results[i][0].transcript;
+        else interim += e.results[i][0].transcript;
+      }
+      inputEl.value = finalTranscript || interim;
+      inputEl.dispatchEvent(new Event("input"));
+    };
+
+    recognition.onend = () => {
+      isRecording = false;
+      micBtn.classList.remove("recording");
+      micBtn.title = "Tap to speak";
+      if (finalTranscript.trim()) {
+        inputEl.value = finalTranscript.trim();
+        inputEl.dispatchEvent(new Event("input"));
+      }
+    };
+
+    recognition.onerror = () => {
+      isRecording = false;
+      micBtn.classList.remove("recording");
+    };
+
+    micBtn.addEventListener("click", () => {
+      if (isRecording) {
+        recognition.stop();
+      } else {
+        finalTranscript = "";
+        recognition.start();
+      }
+    });
+  }
+
   // ── Send ───────────────────────────────────────────────────────────────────
   async function send() {
     const text = inputEl.value.trim();
-    if (!text || isStreaming) return;
+    if ((!text && pendingImages.length === 0) || isStreaming) return;
+
+    const imagesToSend = [...pendingImages];
+    pendingImages = [];
+    renderImagePreviews();
 
     inputEl.value = "";
     inputEl.style.height = "auto";
     sendBtn.disabled = true;
     isStreaming = true;
 
-    appendMessage("user", text);
-    history.push({ role: "user", content: text });
+    // Build user message content for history
+    let userContent;
+    if (imagesToSend.length > 0) {
+      userContent = [];
+      imagesToSend.forEach((img) => {
+        userContent.push({
+          type: "image",
+          source: {
+            type: "base64",
+            media_type: img.mimeType,
+            data: img.dataUrl.split(",")[1],
+          },
+        });
+      });
+      if (text) userContent.push({ type: "text", text });
+      else userContent.push({ type: "text", text: "Please analyze this image and help me troubleshoot." });
+    } else {
+      userContent = text;
+    }
+
+    // Show user message in UI
+    appendUserMessage(text, imagesToSend);
+    history.push({ role: "user", content: userContent });
 
     const typing = appendTyping();
 
@@ -89,9 +245,7 @@
         body: JSON.stringify({ messages: history, audience: currentRole }),
       });
 
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
-      }
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
       typing.remove();
       const assistantEl = appendMessage("assistant", "");
@@ -130,11 +284,28 @@
       appendMessage("assistant", "Sorry, something went wrong on my end. Please try again in a moment — if it keeps happening, try refreshing the page.");
     } finally {
       isStreaming = false;
-      sendBtn.disabled = !inputEl.value.trim();
+      sendBtn.disabled = !inputEl.value.trim() && pendingImages.length === 0;
     }
   }
 
   // ── DOM helpers ────────────────────────────────────────────────────────────
+  function appendUserMessage(text, images) {
+    const div = document.createElement("div");
+    div.className = "message user";
+    let imagesHtml = "";
+    if (images.length > 0) {
+      imagesHtml = `<div class="message-images">${images.map(img =>
+        `<img src="${img.dataUrl}" class="message-image" />`).join("")}</div>`;
+    }
+    div.innerHTML = `
+      <div class="message-avatar">U</div>
+      <div class="message-content">${imagesHtml}${text ? renderMarkdown(text) : ""}</div>
+    `;
+    messagesEl.appendChild(div);
+    scrollToBottom();
+    return div;
+  }
+
   function appendMessage(role, text) {
     const div = document.createElement("div");
     div.className = `message ${role}`;
@@ -173,10 +344,9 @@
       <span class="feedback-label">Was this helpful?</span>
       <button class="feedback-btn up" title="Yes, helpful">👍</button>
       <button class="feedback-btn down" title="Not helpful">👎</button>
-      <span class="feedback-thanks" style="display:none">Thanks for the feedback!</span>
+      <span class="feedback-thanks" style="display:none">Thanks! This helps improve future answers.</span>
     `;
     msgEl.appendChild(bar);
-
     bar.querySelector(".up").addEventListener("click", () => sendFeedback("up", question, answer, bar));
     bar.querySelector(".down").addEventListener("click", () => sendFeedback("down", question, answer, bar));
   }
@@ -192,65 +362,39 @@
     bar.querySelector(".feedback-thanks").style.display = "inline";
   }
 
-  // ── Markdown renderer (minimal, no deps) ───────────────────────────────────
+  // ── Markdown renderer ──────────────────────────────────────────────────────
   function renderMarkdown(text) {
     if (!text) return "";
-
-    // Escape HTML first
     let html = text
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
-
-    // Code blocks
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     html = html.replace(/```[\w]*\n?([\s\S]*?)```/g, "<pre><code>$1</code></pre>");
-
-    // Inline code
     html = html.replace(/`([^`]+)`/g, "<code>$1</code>");
-
-    // Headers
     html = html.replace(/^### (.+)$/gm, "<h3>$1</h3>");
     html = html.replace(/^## (.+)$/gm, "<h2>$1</h2>");
     html = html.replace(/^# (.+)$/gm, "<h1>$1</h1>");
-
-    // Bold and italic
     html = html.replace(/\*\*\*(.+?)\*\*\*/g, "<strong><em>$1</em></strong>");
     html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
     html = html.replace(/\*(.+?)\*/g, "<em>$1</em>");
-
-    // Severity colorization
     html = html.replace(/\bCritical\b/g, '<span class="severity-critical">Critical</span>');
     html = html.replace(/\bSeverity 1\b/g, '<span class="severity-critical">Severity 1</span>');
     html = html.replace(/\bSeverity 2\b/g, '<span class="severity-high">Severity 2</span>');
     html = html.replace(/\bSeverity 3\b/g, '<span class="severity-medium">Severity 3</span>');
     html = html.replace(/\bSeverity 4\b/g, '<span class="severity-low">Severity 4</span>');
-
-    // Ordered lists
     html = html.replace(/^(\d+)\.\s(.+)$/gm, "<li>$2</li>");
     html = html.replace(/(<li>.*<\/li>\n?)+/g, (m) => `<ol>${m}</ol>`);
-
-    // Unordered lists
     html = html.replace(/^[-*]\s(.+)$/gm, "<li>$1</li>");
-    // Wrap orphan li blocks not already in ol
     html = html.replace(/(?<!<\/ol>)(<li>(?:(?!<ol>|<\/ol>)[\s\S])*?<\/li>\n?)+/g, (m) => {
       if (m.includes("<ol>")) return m;
       return `<ul>${m}</ul>`;
     });
-
-    // Horizontal rules
     html = html.replace(/^---$/gm, "<hr/>");
-
-    // Paragraphs — split on double newlines
     const blocks = html.split(/\n{2,}/);
-    html = blocks
-      .map((block) => {
-        block = block.trim();
-        if (!block) return "";
-        if (/^<(h[1-6]|ul|ol|pre|hr)/.test(block)) return block;
-        return `<p>${block.replace(/\n/g, "<br/>")}</p>`;
-      })
-      .join("\n");
-
+    html = blocks.map((block) => {
+      block = block.trim();
+      if (!block) return "";
+      if (/^<(h[1-6]|ul|ol|pre|hr)/.test(block)) return block;
+      return `<p>${block.replace(/\n/g, "<br/>")}</p>`;
+    }).join("\n");
     return html;
   }
 })();
