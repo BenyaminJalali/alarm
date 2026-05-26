@@ -80,25 +80,22 @@
   // ── Image handling ─────────────────────────────────────────────────────────
   imageInput.addEventListener("change", async () => {
     const files = Array.from(imageInput.files);
-    const unsupported = [];
     for (const file of files) {
-      const isHeic = file.type === "image/heic" || file.type === "image/heif" ||
-                     file.name.toLowerCase().endsWith(".heic") || file.name.toLowerCase().endsWith(".heif");
-      if (isHeic) {
-        unsupported.push(file.name);
-        continue;
-      }
       try {
-        const compressed = await compressImage(file, 3.5 * 1024 * 1024);
+        let processedFile = file;
+        const isHeic = file.type === "image/heic" || file.type === "image/heif" ||
+                       file.name.toLowerCase().endsWith(".heic") || file.name.toLowerCase().endsWith(".heif");
+        if (isHeic && typeof heic2any !== "undefined") {
+          const blob = await heic2any({ blob: file, toType: "image/jpeg", quality: 0.85 });
+          processedFile = new File([blob], file.name.replace(/\.heic$/i, ".jpg"), { type: "image/jpeg" });
+        }
+        const compressed = await compressImage(processedFile, 3.5 * 1024 * 1024);
         pendingImages.push(compressed);
       } catch (e) {
-        unsupported.push(file.name);
+        console.error("Failed to process image:", file.name, e);
       }
     }
     imageInput.value = "";
-    if (unsupported.length > 0) {
-      appendMessage("assistant", `⚠️ **${unsupported.join(", ")}** couldn't be attached — HEIC/HEIF format isn't supported in browsers. On your iPhone, go to **Settings → Camera → Formats** and switch to **Most Compatible** (JPEG), then take a new photo and try again. Or take a screenshot of the image (Windows+Shift+S) and attach that instead.`);
-    }
     renderImagePreviews();
     sendBtn.disabled = pendingImages.length === 0 && !inputEl.value.trim() || isStreaming;
   });
