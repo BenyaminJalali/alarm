@@ -317,6 +317,18 @@ def chat():
 
     bedrock = boto3.client("bedrock-runtime", region_name=AWS_REGION)
 
+    # If any message contains an image, use a compact system prompt to stay under Bedrock's size limit
+    has_images = any(
+        isinstance(m.get("content"), list) and
+        any(b.get("type") == "image" for b in m["content"])
+        for m in messages
+    )
+
+    if has_images:
+        system = (audience_note + "\n\n" if audience_note else "") + "\n".join(
+            SYSTEM_PROMPT.split("## Alarm Knowledge Base")[0].splitlines()
+        ).strip() + "\n\nAnswer based on what you can see in the image(s) and your knowledge of Generac R2 systems."
+
     body = json.dumps({
         "anthropic_version": "bedrock-2023-05-31",
         "max_tokens": 4096,
@@ -325,18 +337,21 @@ def chat():
     })
 
     def generate():
-        response = bedrock.invoke_model_with_response_stream(
-            modelId=BEDROCK_MODEL_ID,
-            contentType="application/json",
-            accept="application/json",
-            body=body,
-        )
-        for event in response["body"]:
-            chunk = json.loads(event["chunk"]["bytes"])
-            if chunk.get("type") == "content_block_delta":
-                delta = chunk.get("delta", {})
-                if delta.get("type") == "text_delta":
-                    yield f"data: {json.dumps({'text': delta['text']})}\n\n"
+        try:
+            response = bedrock.invoke_model_with_response_stream(
+                modelId=BEDROCK_MODEL_ID,
+                contentType="application/json",
+                accept="application/json",
+                body=body,
+            )
+            for event in response["body"]:
+                chunk = json.loads(event["chunk"]["bytes"])
+                if chunk.get("type") == "content_block_delta":
+                    delta = chunk.get("delta", {})
+                    if delta.get("type") == "text_delta":
+                        yield f"data: {json.dumps({'text': delta['text']})}\n\n"
+        except Exception as e:
+            yield f"data: {json.dumps({'text': f'Sorry, there was an error processing your request: {str(e)}'})}\n\n"
         yield "data: [DONE]\n\n"
 
     return Response(stream_with_context(generate()), mimetype="text/event-stream")
