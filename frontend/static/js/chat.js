@@ -82,15 +82,8 @@
     const files = Array.from(imageInput.files);
     for (const file of files) {
       try {
-        let processedFile = file;
-        const isHeic = file.type === "image/heic" || file.type === "image/heif" ||
-                       file.name.toLowerCase().endsWith(".heic") || file.name.toLowerCase().endsWith(".heif");
-        if (isHeic && typeof heic2any !== "undefined") {
-          const blob = await heic2any({ blob: file, toType: "image/jpeg", quality: 0.85 });
-          processedFile = new File([blob], file.name.replace(/\.heic$/i, ".jpg"), { type: "image/jpeg" });
-        }
-        const compressed = await compressImage(processedFile, 3.5 * 1024 * 1024);
-        pendingImages.push(compressed);
+        const result = await loadImageFile(file);
+        pendingImages.push(result);
       } catch (e) {
         console.error("Failed to process image:", file.name, e);
       }
@@ -99,6 +92,31 @@
     renderImagePreviews();
     sendBtn.disabled = pendingImages.length === 0 && !inputEl.value.trim() || isStreaming;
   });
+
+  async function loadImageFile(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target.result;
+        // Try canvas decode first (works for JPEG, PNG, WebP, and HEIC on Windows via OS codec)
+        const img = new Image();
+        img.onload = () => {
+          // Canvas decode succeeded — compress and resolve
+          compressImage(file, 3.5 * 1024 * 1024).then(resolve).catch(() => {
+            // Canvas compress failed — send raw
+            resolve({ dataUrl, mimeType: file.type || "image/jpeg", filename: file.name });
+          });
+        };
+        img.onerror = () => {
+          // Canvas can't decode this format — send raw base64 as JPEG and let the model try
+          resolve({ dataUrl, mimeType: "image/jpeg", filename: file.name });
+        };
+        img.src = dataUrl;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
 
   function renderImagePreviews() {
     imagePreviewBar.innerHTML = "";
