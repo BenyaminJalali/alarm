@@ -81,11 +81,14 @@
   imageInput.addEventListener("change", async () => {
     const files = Array.from(imageInput.files);
     for (const file of files) {
+      console.log("[image] selected:", file.name, "type:", file.type, "size:", file.size);
       try {
         const result = await loadImageFile(file);
+        console.log("[image] processed OK:", file.name, "->", result.mimeType, "dataUrl length:", result.dataUrl.length);
         pendingImages.push(result);
       } catch (e) {
-        console.error("Failed to process image:", file.name, e);
+        console.error("[image] failed:", file.name, e);
+        appendMessage("assistant", `⚠️ Could not attach **${file.name}**: ${e.message}. Try a screenshot (PNG) instead.`);
       }
     }
     imageInput.value = "";
