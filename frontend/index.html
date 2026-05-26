@@ -86,14 +86,14 @@
       <div class="input-area">
         <div id="imagePreviewBar" class="image-preview-bar" style="display:none"></div>
         <div class="input-wrapper">
-          <button id="imageBtn" class="tool-btn" title="Attach photo">
+          <label id="imageBtn" class="tool-btn" title="Attach photo" style="cursor:pointer;display:flex;align-items:center;justify-content:center;">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
               <rect x="2" y="4" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
               <circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="1.5"/>
               <circle cx="15" cy="6" r="1" fill="currentColor"/>
             </svg>
-          </button>
-          <input type="file" id="imageInput" accept="image/*" multiple style="display:none" />
+            <input type="file" id="imageInput" accept="image/*" multiple style="display:none" />
+          </label>
           <textarea
             id="userInput"
             placeholder="Describe the fault or alarm..."

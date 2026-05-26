@@ -78,8 +78,6 @@
   }
 
   // ── Image handling ─────────────────────────────────────────────────────────
-  imageBtn.addEventListener("click", () => imageInput.click());
-
   imageInput.addEventListener("change", async () => {
     const files = Array.from(imageInput.files);
     for (const file of files) {
