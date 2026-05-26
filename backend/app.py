@@ -389,6 +389,34 @@ def feedback():
     return jsonify({"ok": True})
 
 
+@app.route("/api/convert-image", methods=["POST"])
+def convert_image():
+    """Convert HEIC/HEIF to JPEG server-side."""
+    try:
+        from pillow_heif import register_heif_opener
+        from PIL import Image
+        import io, base64
+        register_heif_opener()
+    except ImportError:
+        return jsonify({"error": "HEIC conversion not available"}), 501
+
+    data = request.json or {}
+    b64 = data.get("data", "")
+    if not b64:
+        return jsonify({"error": "No image data"}), 400
+
+    try:
+        img_bytes = base64.b64decode(b64)
+        img = Image.open(io.BytesIO(img_bytes))
+        out = io.BytesIO()
+        img.convert("RGB").save(out, format="JPEG", quality=85)
+        out.seek(0)
+        result = base64.b64encode(out.read()).decode()
+        return jsonify({"data": result, "mimeType": "image/jpeg"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 @app.route("/api/health")
 def health():
     kb = load_knowledge_base()

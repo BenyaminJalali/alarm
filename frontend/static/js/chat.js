@@ -94,25 +94,34 @@
   });
 
   async function loadImageFile(file) {
+    const isHeic = file.type === "image/heic" || file.type === "image/heif" ||
+                   file.name.toLowerCase().endsWith(".heic") || file.name.toLowerCase().endsWith(".heif");
+
+    if (isHeic) {
+      // Send to server for conversion
+      const raw = await fileToBase64(file);
+      const res = await fetch("/api/convert-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data: raw }),
+      });
+      if (!res.ok) throw new Error("HEIC conversion failed");
+      const json = await res.json();
+      if (json.error) throw new Error(json.error);
+      return {
+        dataUrl: "data:image/jpeg;base64," + json.data,
+        mimeType: "image/jpeg",
+        filename: file.name.replace(/\.heic$/i, ".jpg"),
+      };
+    }
+
+    return compressImage(file, 3.5 * 1024 * 1024);
+  }
+
+  function fileToBase64(file) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = (e) => {
-        const dataUrl = e.target.result;
-        // Try canvas decode first (works for JPEG, PNG, WebP, and HEIC on Windows via OS codec)
-        const img = new Image();
-        img.onload = () => {
-          // Canvas decode succeeded — compress and resolve
-          compressImage(file, 3.5 * 1024 * 1024).then(resolve).catch(() => {
-            // Canvas compress failed — send raw
-            resolve({ dataUrl, mimeType: file.type || "image/jpeg", filename: file.name });
-          });
-        };
-        img.onerror = () => {
-          // Canvas can't decode this format — send raw base64 as JPEG and let the model try
-          resolve({ dataUrl, mimeType: "image/jpeg", filename: file.name });
-        };
-        img.src = dataUrl;
-      };
+      reader.onload = (e) => resolve(e.target.result.split(",")[1]);
       reader.onerror = reject;
       reader.readAsDataURL(file);
     });
