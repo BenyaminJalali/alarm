@@ -80,13 +80,27 @@
   // ── Image handling ─────────────────────────────────────────────────────────
   imageInput.addEventListener("change", async () => {
     const files = Array.from(imageInput.files);
+    const unsupported = [];
     for (const file of files) {
-      const compressed = await compressImage(file, 3.5 * 1024 * 1024); // 3.5MB max
-      pendingImages.push(compressed);
+      const isHeic = file.type === "image/heic" || file.type === "image/heif" ||
+                     file.name.toLowerCase().endsWith(".heic") || file.name.toLowerCase().endsWith(".heif");
+      if (isHeic) {
+        unsupported.push(file.name);
+        continue;
+      }
+      try {
+        const compressed = await compressImage(file, 3.5 * 1024 * 1024);
+        pendingImages.push(compressed);
+      } catch (e) {
+        unsupported.push(file.name);
+      }
     }
     imageInput.value = "";
+    if (unsupported.length > 0) {
+      appendMessage("assistant", `⚠️ **${unsupported.join(", ")}** couldn't be attached — HEIC/HEIF format isn't supported in browsers. On your iPhone, go to **Settings → Camera → Formats** and switch to **Most Compatible** (JPEG), then take a new photo and try again. Or take a screenshot of the image (Windows+Shift+S) and attach that instead.`);
+    }
     renderImagePreviews();
-    sendBtn.disabled = isStreaming;
+    sendBtn.disabled = pendingImages.length === 0 && !inputEl.value.trim() || isStreaming;
   });
 
   function renderImagePreviews() {
