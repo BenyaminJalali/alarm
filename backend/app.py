@@ -27,6 +27,7 @@ ADMIN_GITHUB_USER = os.environ.get("ADMIN_GITHUB_USER", "BenyaminJalali")
 CONVERSATIONS_PATH = Path(__file__).parent.parent / "data" / "conversations.jsonl"
 
 app.secret_key = FLASK_SECRET_KEY
+app.config["MAX_CONTENT_LENGTH"] = 20 * 1024 * 1024  # 20MB
 
 _knowledge_base: dict | None = None
 
