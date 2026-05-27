@@ -30,6 +30,25 @@ app.secret_key = FLASK_SECRET_KEY
 app.config["MAX_CONTENT_LENGTH"] = 20 * 1024 * 1024  # 20MB
 
 _knowledge_base: dict | None = None
+_kb_index: list | None = None  # pre-built search index
+
+# Stop words to ignore when scoring
+_STOP_WORDS = {
+    "a", "an", "the", "is", "it", "in", "on", "at", "to", "for", "of", "and",
+    "or", "with", "my", "i", "what", "how", "why", "does", "do", "can", "be",
+    "not", "this", "that", "are", "was", "has", "have", "get", "getting",
+    "showing", "shows", "see", "seeing", "there", "keep", "keeps", "its",
+    "help", "please", "when", "should", "would", "could", "need", "want",
+}
+
+# Device synonym map — user words → KB device codes
+_DEVICE_SYNONYMS = {
+    "inverter": "INV", "inv": "INV",
+    "battery": "BMU", "bmu": "BMU",
+    "gateway": "GMS", "gms": "GMS",
+    "disconnect": "MANTA", "manta": "MANTA", "sds": "MANTA",
+    "micro": "MI", "microinverter": "MI", "mi": "MI",
+}
 
 
 def load_knowledge_base() -> dict:
@@ -43,59 +62,161 @@ def load_knowledge_base() -> dict:
     return _knowledge_base
 
 
-def build_context_block() -> str:
+def _build_kb_index():
+    """Build a search index once at startup. Each item is (searchable_text, entry)."""
+    global _kb_index
+    if _kb_index is not None:
+        return _kb_index
     kb = load_knowledge_base()
-    entries = kb.get("entries", [])
-    lines = []
-    for e in entries:
-        name = e.get("alarm_name") or e.get("id", "")
-        device = e.get("device", "")
-        friendly = e.get("friendly_name", "")
-        severity = e.get("severity", "")
-        alarm_code = e.get("alarm_code", "")
-        alarm_type = e.get("alarm_type", "")
+    index = []
+    for e in kb.get("entries", []):
         eng = e.get("engineering", {})
         prod = e.get("product", {})
-        vis = e.get("visibility", {})
+        ts = eng.get("troubleshooting") or prod.get("corrective_action") or []
+        if isinstance(ts, list):
+            ts_text = " ".join(ts)
+        else:
+            ts_text = str(ts)
+        searchable = " ".join(filter(None, [
+            e.get("alarm_name", ""),
+            e.get("friendly_name", ""),
+            e.get("device", ""),
+            e.get("alarm_code", ""),
+            eng.get("description", ""),
+            eng.get("trigger", ""),
+            eng.get("internal_notes", ""),
+            prod.get("description", ""),
+            prod.get("corrective_action", "") if isinstance(prod.get("corrective_action"), str) else "",
+            ts_text,
+        ])).lower()
+        index.append((searchable, e))
+    _kb_index = index
+    return _kb_index
 
-        desc = eng.get("description") or prod.get("description") or ""
-        trigger = eng.get("trigger") or ""
-        threshold = eng.get("threshold") or ""
-        ts_steps = eng.get("troubleshooting") or prod.get("corrective_action") or []
-        internal = eng.get("internal_notes") or ""
 
-        entry_lines = [f"ALARM: {name}"]
-        if device:
-            entry_lines.append(f"  Device: {device}")
-        if friendly:
-            entry_lines.append(f"  Friendly Name: {friendly}")
-        if alarm_code:
-            entry_lines.append(f"  Code: {alarm_code}")
-        if severity:
-            entry_lines.append(f"  Severity: {severity}")
-        if alarm_type:
-            entry_lines.append(f"  Type: {alarm_type}")
-        if desc:
-            entry_lines.append(f"  Description: {desc}")
-        if trigger:
-            entry_lines.append(f"  Trigger: {trigger}")
-        if threshold:
-            entry_lines.append(f"  Threshold: {threshold}")
-        if vis:
-            visible_to = [k for k, v in vis.items() if v]
-            if visible_to:
-                entry_lines.append(f"  Visible to: {', '.join(visible_to)}")
-        if ts_steps:
-            if isinstance(ts_steps, list):
-                entry_lines.append(f"  Troubleshooting: {' | '.join(ts_steps)}")
-            else:
-                entry_lines.append(f"  Troubleshooting: {ts_steps}")
-        if internal:
-            entry_lines.append(f"  Internal Notes: {internal}")
+def _is_supplemental(entry: dict) -> bool:
+    """Supplemental entries are non-alarm KB items (commissioning, Field Pro, etc.)."""
+    sources = entry.get("sources", [])
+    alarm_sources = {"masterlist", "inv_extended_desc", "bmu_extended_desc",
+                     "reef_headend", "error_catalog"}
+    return not any(s in alarm_sources for s in sources)
 
-        lines.append("\n".join(entry_lines))
 
-    return "\n\n".join(lines)
+def search_kb(query: str, top_n: int = 15) -> list:
+    """Return the top_n most relevant KB entries for a query using keyword scoring."""
+    index = _build_kb_index()
+    query_lower = query.lower()
+    query_words = {w for w in query_lower.split() if w not in _STOP_WORDS and len(w) > 2}
+
+    # Expand device synonyms — e.g. "battery" → also score "BMU" matches higher
+    device_boost = set()
+    for word in list(query_words):
+        if word in _DEVICE_SYNONYMS:
+            device_boost.add(_DEVICE_SYNONYMS[word].lower())
+
+    # Check for explicit alarm code pattern (e.g. "008A", "F001")
+    import re
+    alarm_code_pattern = re.compile(r'\b[0-9a-fA-F]{3,4}[A-Za-z0-9]?\b')
+    explicit_codes = {m.group().lower() for m in alarm_code_pattern.finditer(query_lower)}
+
+    supplemental = []
+    scored = []
+
+    for searchable, entry in index:
+        if _is_supplemental(entry):
+            supplemental.append(entry)
+            continue
+
+        score = 0
+
+        # Exact alarm code match → very high weight
+        if explicit_codes:
+            entry_code = entry.get("alarm_code", "").lower()
+            if entry_code and any(c in entry_code for c in explicit_codes):
+                score += 20
+
+        # Device match boost
+        entry_device = entry.get("device", "").lower()
+        if device_boost and entry_device in device_boost:
+            score += 5
+
+        # Keyword overlap with searchable text
+        for word in query_words:
+            if word in searchable:
+                # Higher weight for matches in name/friendly_name
+                if word in (entry.get("alarm_name", "") + " " + entry.get("friendly_name", "")).lower():
+                    score += 3
+                else:
+                    score += 1
+
+        if score > 0:
+            scored.append((score, entry))
+
+    scored.sort(key=lambda x: x[0], reverse=True)
+    top_entries = [e for _, e in scored[:top_n]]
+
+    # Always include all supplemental entries (commissioning, Field Pro, etc.)
+    return supplemental + top_entries
+
+
+def _format_entry(e: dict) -> str:
+    name = e.get("alarm_name") or e.get("id", "")
+    device = e.get("device", "")
+    friendly = e.get("friendly_name", "")
+    severity = e.get("severity", "")
+    alarm_code = e.get("alarm_code", "")
+    alarm_type = e.get("alarm_type", "")
+    eng = e.get("engineering", {})
+    prod = e.get("product", {})
+    vis = e.get("visibility", {})
+
+    desc = eng.get("description") or prod.get("description") or ""
+    trigger = eng.get("trigger") or ""
+    threshold = eng.get("threshold") or ""
+    ts_steps = eng.get("troubleshooting") or prod.get("corrective_action") or []
+    internal = eng.get("internal_notes") or ""
+
+    entry_lines = [f"ALARM: {name}"]
+    if device:
+        entry_lines.append(f"  Device: {device}")
+    if friendly:
+        entry_lines.append(f"  Friendly Name: {friendly}")
+    if alarm_code:
+        entry_lines.append(f"  Code: {alarm_code}")
+    if severity:
+        entry_lines.append(f"  Severity: {severity}")
+    if alarm_type:
+        entry_lines.append(f"  Type: {alarm_type}")
+    if desc:
+        entry_lines.append(f"  Description: {desc}")
+    if trigger:
+        entry_lines.append(f"  Trigger: {trigger}")
+    if threshold:
+        entry_lines.append(f"  Threshold: {threshold}")
+    if vis:
+        visible_to = [k for k, v in vis.items() if v]
+        if visible_to:
+            entry_lines.append(f"  Visible to: {', '.join(visible_to)}")
+    if ts_steps:
+        if isinstance(ts_steps, list):
+            entry_lines.append(f"  Troubleshooting: {' | '.join(ts_steps)}")
+        else:
+            entry_lines.append(f"  Troubleshooting: {ts_steps}")
+    if internal:
+        entry_lines.append(f"  Internal Notes: {internal}")
+
+    return "\n".join(entry_lines)
+
+
+def build_context_block(query: str = "") -> str:
+    if query:
+        entries = search_kb(query, top_n=15)
+    else:
+        # Fallback: only supplemental + first 30 alarm entries (for health check etc.)
+        index = _build_kb_index()
+        entries = [e for _, e in index if _is_supplemental(e)]
+        entries += [e for _, e in index[:30] if not _is_supplemental(e)]
+    return "\n\n".join(_format_entry(e) for e in entries)
 
 
 def get_similar_resolved_cases(question: str, limit: int = 3) -> str:
@@ -282,9 +403,7 @@ def chat():
     except Exception:
         pass
 
-    kb_context = build_context_block()
-
-    # Get first user text message for RAG lookup
+    # Extract first user text for RAG (both KB search and resolved cases)
     first_text = ""
     for msg in messages:
         if msg.get("role") == "user":
@@ -299,6 +418,7 @@ def chat():
             if first_text:
                 break
 
+    kb_context = build_context_block(first_text)
     resolved_cases = get_similar_resolved_cases(first_text)
     resolved_block = ""
     if resolved_cases:
