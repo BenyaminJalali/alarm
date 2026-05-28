@@ -27,6 +27,7 @@ ADMIN_GITHUB_USER = os.environ.get("ADMIN_GITHUB_USER", "BenyaminJalali")
 KB_REBUILD_SECRET = os.environ.get("KB_REBUILD_SECRET", "")
 CONVERSATIONS_PATH = Path(__file__).parent.parent / "data" / "conversations.jsonl"
 KB_REBUILD_LOG_PATH = Path(__file__).parent.parent / "data" / "kb_rebuild_log.jsonl"
+FLEET_NOTES_PATH = Path(__file__).parent.parent / "data" / "fleet_notes.json"
 
 app.secret_key = FLASK_SECRET_KEY
 app.config["MAX_CONTENT_LENGTH"] = 20 * 1024 * 1024  # 20MB
@@ -512,6 +513,11 @@ def kb_entries():
             "sources": e.get("sources", []),
             "visibility": e.get("visibility", {}),
         })
+    # Attach fleet notes to each entry
+    fleet_notes = load_fleet_notes()
+    for row in rows:
+        row["fleet_notes"] = fleet_notes.get(row["id"], [])
+
     rebuild_log = []
     if KB_REBUILD_LOG_PATH.exists():
         with open(KB_REBUILD_LOG_PATH) as f:
@@ -570,11 +576,16 @@ def chat():
 
     kb_context = build_context_block(first_text)
     resolved_cases = get_similar_resolved_cases(first_text)
+    fleet_notes = get_fleet_notes_for_query(first_text)
+
     resolved_block = ""
     if resolved_cases:
         resolved_block = f"The following are real resolved cases from dealers who had similar problems. Use these to give faster, more accurate answers:\n\n{resolved_cases}"
     else:
         resolved_block = "No similar resolved cases yet. Answer based on the alarm knowledge base."
+
+    if fleet_notes:
+        resolved_block += f"\n\n## Fleet Team Field Notes\nThese notes were added by Generac's fleet team based on real field experience. Treat them as high-confidence corrections or additions to the knowledge base:\n\n{fleet_notes}"
 
     system = SYSTEM_PROMPT.format(kb_context=kb_context, resolved_cases=resolved_block)
 
@@ -657,6 +668,86 @@ def feedback():
         with open(RESOLVED_PATH, "a") as f:
             f.write(json.dumps(resolved_record) + "\n")
 
+    return jsonify({"ok": True})
+
+
+def load_fleet_notes() -> dict:
+    """Load fleet notes keyed by alarm_id. Never wiped by KB rebuild."""
+    if FLEET_NOTES_PATH.exists():
+        with open(FLEET_NOTES_PATH) as f:
+            return json.load(f)
+    return {}
+
+
+def save_fleet_notes(notes: dict):
+    with open(FLEET_NOTES_PATH, "w") as f:
+        json.dump(notes, f, indent=2)
+
+
+def get_fleet_notes_for_query(query: str) -> str:
+    """Return formatted fleet notes relevant to a query."""
+    notes = load_fleet_notes()
+    if not notes:
+        return ""
+    query_lower = query.lower()
+    query_words = {w for w in query_lower.split() if len(w) > 2}
+    blocks = []
+    for alarm_id, entries in notes.items():
+        searchable = alarm_id.lower().replace("_", " ")
+        if any(w in searchable for w in query_words):
+            for entry in entries[-3:]:  # most recent 3 notes per alarm
+                author = entry.get("author", "Fleet")
+                date = entry.get("ts", "")[:10]
+                note = entry.get("note", "")
+                alarm_name = entry.get("alarm_name", alarm_id)
+                blocks.append(f"FLEET NOTE [{alarm_name}] by {author} on {date}:\n{note}")
+    return "\n\n".join(blocks)
+
+
+@app.route("/api/fleet-notes", methods=["GET"])
+def get_fleet_notes():
+    return jsonify(load_fleet_notes())
+
+
+@app.route("/api/fleet-notes", methods=["POST"])
+def add_fleet_note():
+    data = request.json or {}
+    alarm_id = data.get("alarm_id", "").strip()
+    note = data.get("note", "").strip()
+    author = data.get("author", "Fleet Team").strip()
+    alarm_name = data.get("alarm_name", alarm_id).strip()
+
+    if not alarm_id or not note:
+        return jsonify({"error": "alarm_id and note are required"}), 400
+
+    notes = load_fleet_notes()
+    if alarm_id not in notes:
+        notes[alarm_id] = []
+
+    notes[alarm_id].append({
+        "ts": datetime.datetime.utcnow().isoformat(),
+        "author": author,
+        "alarm_name": alarm_name,
+        "note": note,
+    })
+    save_fleet_notes(notes)
+    return jsonify({"ok": True, "total_notes": len(notes[alarm_id])})
+
+
+@app.route("/api/fleet-notes/<alarm_id>", methods=["DELETE"])
+def delete_fleet_note():
+    data = request.json or {}
+    alarm_id = data.get("alarm_id", "")
+    index = data.get("index")
+    notes = load_fleet_notes()
+    if alarm_id in notes and index is not None:
+        try:
+            notes[alarm_id].pop(int(index))
+            if not notes[alarm_id]:
+                del notes[alarm_id]
+            save_fleet_notes(notes)
+        except (IndexError, ValueError):
+            return jsonify({"error": "Invalid index"}), 400
     return jsonify({"ok": True})
 
 

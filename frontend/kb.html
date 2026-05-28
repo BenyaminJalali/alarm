@@ -192,11 +192,24 @@
     .detail-field label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; display: block; margin-bottom: 4px; }
     .detail-field p { color: #e2e8f0; font-size: 0.875rem; line-height: 1.5; }
     .detail-field.full { grid-column: 1 / -1; }
-    .detail-tabs { display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 1px solid #2a2d3a; }
+    .detail-tabs { display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 1px solid #2a2d3a; flex-wrap: wrap; }
     .detail-tab { padding: 8px 14px; border: none; background: none; color: #64748b; font-size: 0.85rem; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
     .detail-tab.active { color: #E8500A; border-bottom-color: #E8500A; }
     .detail-tab-content { display: none; }
     .detail-tab-content.active { display: block; }
+
+    /* Fleet notes */
+    .note-card { background: #0f1117; border: 1px solid #2a2d3a; border-radius: 7px; padding: 12px 14px; margin-bottom: 10px; }
+    .note-meta { font-size: 0.75rem; color: #475569; margin-bottom: 6px; display: flex; justify-content: space-between; }
+    .note-text { color: #cbd5e1; font-size: 0.875rem; line-height: 1.6; white-space: pre-wrap; }
+    .note-add { margin-top: 16px; border-top: 1px solid #2a2d3a; padding-top: 16px; }
+    .note-author { width: 100%; background: #0f1117; border: 1px solid #2a2d3a; border-radius: 6px; padding: 7px 10px; color: #e2e8f0; font-size: 0.825rem; margin-bottom: 8px; }
+    .note-input { width: 100%; background: #0f1117; border: 1px solid #2a2d3a; border-radius: 6px; padding: 8px 10px; color: #e2e8f0; font-size: 0.875rem; resize: vertical; min-height: 80px; font-family: inherit; }
+    .note-author:focus, .note-input:focus { outline: none; border-color: #E8500A; }
+    .note-save { margin-top: 8px; background: #E8500A; color: #fff; border: none; border-radius: 6px; padding: 7px 16px; font-size: 0.825rem; font-weight: 600; cursor: pointer; }
+    .note-save:hover { background: #d14509; }
+    .note-save:disabled { background: #374151; color: #6b7280; cursor: not-allowed; }
+    .note-badge { display: inline-block; background: #E8500A; color: #fff; border-radius: 10px; font-size: 0.65rem; font-weight: 700; padding: 1px 6px; margin-left: 4px; vertical-align: middle; }
     .steps-list { padding-left: 20px; }
     .steps-list li { margin-bottom: 8px; color: #cbd5e1; line-height: 1.5; font-size: 0.875rem; }
     .visibility-badges { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -300,11 +313,11 @@
     <option value="Low">Low</option>
     <option value="Info">Info</option>
   </select>
-  <select class="filter-select" id="visFilter">
-    <option value="">All Audiences</option>
-    <option value="homeowner">Homeowner visible</option>
-    <option value="installer">Installer visible</option>
-    <option value="support">Support only</option>
+  <select class="filter-select" id="gapFilter">
+    <option value="">All Entries</option>
+    <option value="no-action">Missing corrective action</option>
+    <option value="no-description">Missing description</option>
+    <option value="has-notes">Has fleet notes</option>
   </select>
   <span class="result-count" id="resultCount"></span>
 </div>
@@ -360,6 +373,7 @@
       <button class="detail-tab active" onclick="switchTab('description')">Description</button>
       <button class="detail-tab" onclick="switchTab('corrective')">Corrective Action</button>
       <button class="detail-tab" onclick="switchTab('internal')">Internal Notes</button>
+      <button class="detail-tab" onclick="switchTab('fleet')">Fleet Notes <span id="dFleetBadge"></span></button>
       <button class="detail-tab" onclick="switchTab('sources')">Sources</button>
     </div>
 
@@ -371,6 +385,15 @@
     </div>
     <div class="detail-tab-content" id="tab-internal">
       <p id="dInternal" style="color:#94a3b8;line-height:1.6;font-size:0.875rem;"></p>
+    </div>
+    <div class="detail-tab-content" id="tab-fleet">
+      <div id="dFleetNotes"></div>
+      <div class="note-add">
+        <div style="font-size:0.75rem;color:#64748b;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em;">Add a field note</div>
+        <input class="note-author" id="noteAuthor" placeholder="Your name (e.g. Jane — Fleet Team)" />
+        <textarea class="note-input" id="noteInput" placeholder="Describe what you observed in the field, a better fix, or anything that should be added to this alarm's guidance..."></textarea>
+        <button class="note-save" id="noteSaveBtn" onclick="saveNote()">Save Note</button>
+      </div>
     </div>
     <div class="detail-tab-content" id="tab-sources">
       <div class="sources-list" id="dSources"></div>
@@ -468,17 +491,14 @@
     const search = document.getElementById('searchInput').value.toLowerCase();
     const device = document.getElementById('deviceFilter').value;
     const severity = document.getElementById('severityFilter').value.toLowerCase();
-    const vis = document.getElementById('visFilter').value;
+    const gap = document.getElementById('gapFilter').value;
 
     filtered = allEntries.filter(e => {
       if (device && e.device !== device && !e.device?.startsWith(device)) return false;
       if (severity && !e.severity.toLowerCase().includes(severity)) return false;
-      if (vis) {
-        const v = e.visibility || {};
-        if (vis === 'homeowner' && !v.homeowner) return false;
-        if (vis === 'installer' && !v.installer) return false;
-        if (vis === 'support' && (v.homeowner || v.installer)) return false;
-      }
+      if (gap === 'no-action' && e.corrective_action) return false;
+      if (gap === 'no-description' && e.description) return false;
+      if (gap === 'has-notes' && !(e.fleet_notes && e.fleet_notes.length)) return false;
       if (search) {
         const hay = [e.alarm_name, e.friendly_name, e.alarm_code, e.description, e.corrective_action, e.device].join(' ').toLowerCase();
         if (!hay.includes(search)) return false;
@@ -510,12 +530,18 @@
   document.getElementById('searchInput').addEventListener('input', applyFilters);
   document.getElementById('deviceFilter').addEventListener('change', applyFilters);
   document.getElementById('severityFilter').addEventListener('change', applyFilters);
-  document.getElementById('visFilter').addEventListener('change', applyFilters);
+  document.getElementById('gapFilter').addEventListener('change', applyFilters);
 
   // ── Detail panel ──
+  let currentEntryId = null;
+  let currentEntryName = null;
+
   function openDetail(idx) {
     const e = filtered[idx];
-    document.getElementById('dTitle').textContent = e.friendly_name || e.alarm_name || e.id;
+    currentEntryId = e.id;
+    currentEntryName = e.friendly_name || e.alarm_name || e.id;
+
+    document.getElementById('dTitle').textContent = currentEntryName;
     document.getElementById('dSubtitle').textContent = e.alarm_name || '';
     document.getElementById('dDevice').textContent = DEVICE_LABELS[e.device] || e.device || '—';
     document.getElementById('dCode').textContent = e.alarm_code || '—';
@@ -536,15 +562,82 @@
       .map(k => `<span class="vis-badge ${vis[k] ? 'vis-yes' : 'vis-no'}">${k.charAt(0).toUpperCase() + k.slice(1)}</span>`)
       .join('');
 
+    // Fleet notes
+    renderFleetNotes(e.fleet_notes || []);
+
     // Sources
     const srcs = e.sources || [];
     document.getElementById('dSources').innerHTML = srcs.length
       ? srcs.map(s => `<span class="source-tag">${s}</span>`).join('')
       : '<span style="color:#475569">No sources recorded.</span>';
 
+    // Reset note input
+    document.getElementById('noteInput').value = '';
+    document.getElementById('noteSaveBtn').disabled = false;
+
     // Reset to first tab
     switchTab('description');
     document.getElementById('detailOverlay').classList.add('open');
+  }
+
+  function renderFleetNotes(notes) {
+    const badge = document.getElementById('dFleetBadge');
+    badge.innerHTML = notes.length ? `<span class="note-badge">${notes.length}</span>` : '';
+    const container = document.getElementById('dFleetNotes');
+    if (!notes.length) {
+      container.innerHTML = '<p style="color:#475569;font-size:0.85rem;margin-bottom:16px;">No fleet notes yet for this alarm. Add the first one below.</p>';
+      return;
+    }
+    container.innerHTML = notes.map((n, i) => `
+      <div class="note-card">
+        <div class="note-meta">
+          <span>${n.author || 'Fleet Team'}</span>
+          <span>${(n.ts || '').slice(0,10)}</span>
+        </div>
+        <div class="note-text">${escHtml(n.note)}</div>
+      </div>
+    `).join('');
+  }
+
+  function escHtml(s) {
+    return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  async function saveNote() {
+    const note = document.getElementById('noteInput').value.trim();
+    const author = document.getElementById('noteAuthor').value.trim() || 'Fleet Team';
+    if (!note || !currentEntryId) return;
+
+    const btn = document.getElementById('noteSaveBtn');
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
+
+    try {
+      const res = await fetch('/api/fleet-notes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          alarm_id: currentEntryId,
+          alarm_name: currentEntryName,
+          note, author,
+        }),
+      });
+      if (!res.ok) throw new Error('Save failed');
+
+      // Refresh the entry in allEntries so gap filter updates
+      const notesData = await (await fetch('/api/fleet-notes')).json();
+      const newNotes = notesData[currentEntryId] || [];
+      const entry = allEntries.find(e => e.id === currentEntryId);
+      if (entry) entry.fleet_notes = newNotes;
+
+      renderFleetNotes(newNotes);
+      document.getElementById('noteInput').value = '';
+      btn.textContent = 'Saved!';
+      setTimeout(() => { btn.textContent = 'Save Note'; btn.disabled = false; }, 1500);
+    } catch {
+      btn.textContent = 'Error — try again';
+      btn.disabled = false;
+    }
   }
 
   function closeDetail(e) {
@@ -557,7 +650,7 @@
 
   function switchTab(name) {
     document.querySelectorAll('.detail-tab').forEach((t, i) => {
-      const names = ['description','corrective','internal','sources'];
+      const names = ['description','corrective','internal','fleet','sources'];
       t.classList.toggle('active', names[i] === name);
     });
     document.querySelectorAll('.detail-tab-content').forEach(c => {
