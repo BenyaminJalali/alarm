@@ -204,6 +204,34 @@ def load_masterlist_from_xlsx() -> list[dict]:
     return all_entries
 
 
+# ── helpers ───────────────────────────────────────────────────────────────────
+
+def infer_device_from_id(alarm_id: str) -> str:
+    """Infer device tag from alarm id like 'configuration.battery.some_alarm'."""
+    s = alarm_id.lower()
+    segments = s.split(".")
+    # Check second segment (e.g. configuration.battery.*)
+    device_seg = segments[1] if len(segments) > 1 else ""
+    if device_seg in ("battery",):
+        return "BMU"
+    if device_seg in ("inverter",):
+        return "INV"
+    if device_seg in ("gateway",):
+        return "GMS"
+    if device_seg in ("disconnect_switch", "sds", "smart_disconnect", "manta"):
+        return "MANTA"
+    # Fallback: check anywhere in the id
+    if "battery" in s or ".bmu" in s:
+        return "BMU"
+    if "inverter" in s or ".inv" in s:
+        return "INV"
+    if "gateway" in s or ".gms" in s:
+        return "GMS"
+    if "disconnect_switch" in s or ".sds." in s or "manta" in s:
+        return "MANTA"
+    return ""
+
+
 # ── parsers ───────────────────────────────────────────────────────────────────
 
 def parse_yaml_entry(content: str, file_path: str) -> dict | None:
@@ -418,6 +446,14 @@ def build():
         if parsed:
             cid = parsed.get("id", path)
             parsed["sources"] = ["error_catalog"]
+            # Infer device from alarm id (e.g. configuration.battery.* → BMU)
+            if not parsed.get("device"):
+                inferred = infer_device_from_id(cid)
+                if inferred:
+                    parsed["device"] = inferred
+            # Use the full id as alarm_name if not set (it IS the firmware alarm identifier)
+            if not parsed.get("alarm_name"):
+                parsed["alarm_name"] = cid
             entry_map[cid] = parsed
     kb["sources"].append("error_catalog")
 
