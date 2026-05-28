@@ -49,6 +49,13 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Sego
 .example-btn { background: transparent; border: 1px solid var(--border); color: var(--text-dim); padding: 7px 10px; border-radius: 6px; cursor: pointer; text-align: left; font-size: 12px; transition: all 0.15s; }
 .example-btn:hover { border-color: var(--orange); color: var(--text); background: rgba(232,80,10,0.05); }
 
+.sidebar-nav { padding: 16px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 4px; }
+.nav-link { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 6px; color: var(--text-dim); text-decoration: none; font-size: 13px; transition: all 0.15s; }
+.nav-link:hover { background: var(--dark-2); color: var(--text); }
+.nav-link.active { background: rgba(232,80,10,0.12); color: var(--orange); font-weight: 600; }
+.nav-link svg { flex-shrink: 0; opacity: 0.7; }
+.nav-link.active svg { opacity: 1; }
+
 .sidebar-footer { margin-top: auto; padding: 16px; border-top: 1px solid var(--border); }
 .kb-status { font-size: 11px; color: var(--text-dimmer); margin-bottom: 10px; }
 .new-chat-btn { width: 100%; background: var(--dark-3); border: 1px solid var(--border); color: var(--text-dim); padding: 9px; border-radius: 6px; cursor: pointer; font-size: 13px; transition: all 0.15s; }
