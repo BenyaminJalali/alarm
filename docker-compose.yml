@@ -14,6 +14,7 @@ services:
       - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
       - GITHUB_CALLBACK_URL=${GITHUB_CALLBACK_URL:-https://alarm.dash-ly.com/admin/callback}
       - ADMIN_GITHUB_USER=${ADMIN_GITHUB_USER:-BenyaminJalali}
+      - KB_REBUILD_SECRET=${KB_REBUILD_SECRET}
     volumes:
       - alarm_data:/app/data
     restart: unless-stopped

@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alarm Knowledge Base — Generac R2</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0f1117;
+      color: #e2e8f0;
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+    }
+
+    /* ── Header ── */
+    .page-header {
+      background: #1a1d27;
+      border-bottom: 1px solid #2a2d3a;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .logo { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 1rem; }
+    .badge {
+      background: #1e293b;
+      color: #94a3b8;
+      border: 1px solid #2a2d3a;
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-size: 0.75rem;
+    }
+    .header-right { display: flex; gap: 8px; align-items: center; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 14px; border-radius: 7px; border: none;
+      font-size: 0.85rem; font-weight: 500; cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-primary { background: #E8500A; color: #fff; }
+    .btn-primary:hover { background: #d14509; }
+    .btn-secondary { background: #1e293b; color: #94a3b8; border: 1px solid #2a2d3a; }
+    .btn-secondary:hover { background: #263346; color: #e2e8f0; }
+    .back-link { color: #64748b; text-decoration: none; font-size: 0.85rem; }
+    .back-link:hover { color: #e2e8f0; }
+
+    /* ── Toolbar ── */
+    .toolbar {
+      padding: 14px 24px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      border-bottom: 1px solid #1e2130;
+    }
+    .search-box {
+      flex: 1; min-width: 220px;
+      background: #1a1d27;
+      border: 1px solid #2a2d3a;
+      border-radius: 7px;
+      padding: 8px 12px;
+      color: #e2e8f0;
+      font-size: 0.875rem;
+    }
+    .search-box:focus { outline: none; border-color: #E8500A; }
+    .filter-select {
+      background: #1a1d27;
+      border: 1px solid #2a2d3a;
+      border-radius: 7px;
+      padding: 8px 10px;
+      color: #e2e8f0;
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+    .filter-select:focus { outline: none; border-color: #E8500A; }
+    .result-count { color: #64748b; font-size: 0.8rem; white-space: nowrap; }
+
+    /* ── Table ── */
+    .table-wrap {
+      overflow-x: auto;
+      padding: 0 24px 24px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 900px;
+    }
+    thead th {
+      text-align: left;
+      padding: 10px 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #64748b;
+      border-bottom: 1px solid #2a2d3a;
+      background: #0f1117;
+      position: sticky;
+      top: 57px;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+    thead th:hover { color: #e2e8f0; }
+    thead th .sort-arrow { margin-left: 4px; opacity: 0.4; }
+    thead th.sorted .sort-arrow { opacity: 1; color: #E8500A; }
+
+    tbody tr {
+      border-bottom: 1px solid #1a1d27;
+      transition: background 0.1s;
+    }
+    tbody tr:hover { background: #1a1d27; cursor: pointer; }
+    tbody td {
+      padding: 10px 12px;
+      vertical-align: top;
+      line-height: 1.4;
+    }
+
+    .device-chip {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .device-INV  { background: #1d3461; color: #60a5fa; }
+    .device-BMU  { background: #14532d; color: #4ade80; }
+    .device-GMS  { background: #3b1f6e; color: #c084fc; }
+    .device-MANTA{ background: #4a1c1c; color: #f87171; }
+    .device-MI   { background: #1c3a3a; color: #34d399; }
+    .device-PWRmicro { background: #2a2006; color: #fbbf24; }
+    .device-other{ background: #1e293b; color: #94a3b8; }
+
+    .severity-chip {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 600;
+    }
+    .sev-critical { background: #450a0a; color: #fca5a5; }
+    .sev-high     { background: #431407; color: #fb923c; }
+    .sev-medium   { background: #3b2a00; color: #fbbf24; }
+    .sev-low      { background: #14532d; color: #86efac; }
+    .sev-info     { background: #1e293b; color: #94a3b8; }
+
+    .code-cell { font-family: monospace; font-size: 0.8rem; color: #94a3b8; }
+    .name-cell { font-weight: 500; color: #e2e8f0; max-width: 260px; }
+    .friendly-cell { color: #cbd5e1; max-width: 220px; }
+    .desc-cell { color: #94a3b8; max-width: 300px; font-size: 0.82rem; }
+    .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+
+    /* ── Detail panel ── */
+    .detail-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 200;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 40px 16px;
+      overflow-y: auto;
+    }
+    .detail-overlay.open { display: flex; }
+    .detail-panel {
+      background: #1a1d27;
+      border: 1px solid #2a2d3a;
+      border-radius: 12px;
+      padding: 28px 32px;
+      max-width: 760px;
+      width: 100%;
+      position: relative;
+    }
+    .detail-close {
+      position: absolute; top: 16px; right: 16px;
+      background: none; border: none; color: #64748b;
+      font-size: 1.2rem; cursor: pointer; line-height: 1;
+    }
+    .detail-close:hover { color: #e2e8f0; }
+    .detail-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 4px; }
+    .detail-subtitle { color: #64748b; font-size: 0.85rem; margin-bottom: 20px; }
+    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+    .detail-field label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; display: block; margin-bottom: 4px; }
+    .detail-field p { color: #e2e8f0; font-size: 0.875rem; line-height: 1.5; }
+    .detail-field.full { grid-column: 1 / -1; }
+    .detail-tabs { display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 1px solid #2a2d3a; }
+    .detail-tab { padding: 8px 14px; border: none; background: none; color: #64748b; font-size: 0.85rem; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+    .detail-tab.active { color: #E8500A; border-bottom-color: #E8500A; }
+    .detail-tab-content { display: none; }
+    .detail-tab-content.active { display: block; }
+    .steps-list { padding-left: 20px; }
+    .steps-list li { margin-bottom: 8px; color: #cbd5e1; line-height: 1.5; font-size: 0.875rem; }
+    .visibility-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+    .vis-badge { padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; }
+    .vis-yes { background: #14532d; color: #86efac; }
+    .vis-no  { background: #1e293b; color: #475569; text-decoration: line-through; }
+    .sources-list { display: flex; flex-wrap: wrap; gap: 6px; }
+    .source-tag { background: #1e293b; color: #64748b; border-radius: 4px; padding: 2px 8px; font-size: 0.75rem; font-family: monospace; }
+
+    /* ── Rebuild log ── */
+    .rebuild-banner {
+      margin: 12px 24px 0;
+      padding: 10px 14px;
+      background: #1a1d27;
+      border: 1px solid #2a2d3a;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .rebuild-banner .pill {
+      background: #14532d; color: #86efac;
+      border-radius: 4px; padding: 1px 7px; font-size: 0.72rem;
+    }
+
+    /* ── Print / PDF ── */
+    @media print {
+      .page-header, .toolbar, .rebuild-banner, .detail-overlay { display: none !important; }
+      body { background: #fff; color: #111; font-size: 11px; }
+      table { min-width: unset; }
+      thead th { background: #f1f5f9; color: #334155; position: static; }
+      tbody tr:hover { background: none; }
+      .device-chip, .severity-chip { border: 1px solid #ccc; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="header-left">
+    <a href="/" class="back-link">← Back to Chat</a>
+    <div class="logo">
+      <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
+        <rect width="28" height="28" rx="6" fill="#E8500A"/>
+        <path d="M7 14h14M14 7v14" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      Alarm Knowledge Base
+    </div>
+    <span class="badge" id="entryCount">Loading...</span>
+  </div>
+  <div class="header-right">
+    <button class="btn btn-secondary" onclick="window.print()">
+      <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M5 7V3h10v4M5 14H3a1 1 0 01-1-1V9a1 1 0 011-1h14a1 1 0 011 1v4a1 1 0 01-1 1h-2M5 11h10v6H5v-6z" stroke="currentColor" stroke-width="1.5"/></svg>
+      Print / PDF
+    </button>
+    <button class="btn btn-secondary" onclick="exportCSV()">
+      <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M10 3v10m0 0l-3-3m3 3l3-3M4 17h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Export CSV
+    </button>
+  </div>
+</div>
+
+<div class="rebuild-banner" id="rebuildBanner" style="display:none">
+  <span class="pill">Auto-sync</span>
+  <span id="rebuildInfo">KB last rebuilt from source repos.</span>
+</div>
+
+<div class="toolbar">
+  <input type="text" class="search-box" id="searchInput" placeholder="Search alarms, codes, descriptions..." />
+  <select class="filter-select" id="deviceFilter">
+    <option value="">All Devices</option>
+    <option value="INV">Inverter</option>
+    <option value="BMU">Battery</option>
+    <option value="GMS">Gateway</option>
+    <option value="MANTA">Smart Disconnect</option>
+    <option value="MI">Micro-Inverter</option>
+    <option value="PWRmicro">PWRmicro</option>
+  </select>
+  <select class="filter-select" id="severityFilter">
+    <option value="">All Severities</option>
+    <option value="Critical">Critical</option>
+    <option value="High">High</option>
+    <option value="Medium">Medium</option>
+    <option value="Low">Low</option>
+    <option value="Info">Info</option>
+  </select>
+  <select class="filter-select" id="visFilter">
+    <option value="">All Audiences</option>
+    <option value="homeowner">Homeowner visible</option>
+    <option value="installer">Installer visible</option>
+    <option value="support">Support only</option>
+  </select>
+  <span class="result-count" id="resultCount"></span>
+</div>
+
+<div class="table-wrap">
+  <table id="kbTable">
+    <thead>
+      <tr>
+        <th onclick="sortBy('device')">Device <span class="sort-arrow">↕</span></th>
+        <th onclick="sortBy('alarm_code')">Code <span class="sort-arrow">↕</span></th>
+        <th onclick="sortBy('friendly_name')">Alarm Name <span class="sort-arrow">↕</span></th>
+        <th onclick="sortBy('severity')">Severity <span class="sort-arrow">↕</span></th>
+        <th onclick="sortBy('alarm_type')">Type <span class="sort-arrow">↕</span></th>
+        <th>Description</th>
+        <th>Audience</th>
+      </tr>
+    </thead>
+    <tbody id="kbBody"></tbody>
+  </table>
+</div>
+
+<!-- Detail panel -->
+<div class="detail-overlay" id="detailOverlay" onclick="closeDetail(event)">
+  <div class="detail-panel" id="detailPanel">
+    <button class="detail-close" onclick="closeDetailBtn()">✕</button>
+    <div class="detail-title" id="dTitle"></div>
+    <div class="detail-subtitle" id="dSubtitle"></div>
+
+    <div class="detail-grid">
+      <div class="detail-field">
+        <label>Device</label>
+        <p id="dDevice"></p>
+      </div>
+      <div class="detail-field">
+        <label>Alarm Code</label>
+        <p id="dCode"></p>
+      </div>
+      <div class="detail-field">
+        <label>Severity</label>
+        <p id="dSeverity"></p>
+      </div>
+      <div class="detail-field">
+        <label>Type</label>
+        <p id="dType"></p>
+      </div>
+      <div class="detail-field full">
+        <label>Visible To</label>
+        <div class="visibility-badges" id="dVisibility"></div>
+      </div>
+    </div>
+
+    <div class="detail-tabs">
+      <button class="detail-tab active" onclick="switchTab('description')">Description</button>
+      <button class="detail-tab" onclick="switchTab('corrective')">Corrective Action</button>
+      <button class="detail-tab" onclick="switchTab('internal')">Internal Notes</button>
+      <button class="detail-tab" onclick="switchTab('sources')">Sources</button>
+    </div>
+
+    <div class="detail-tab-content active" id="tab-description">
+      <p id="dDescription" style="color:#cbd5e1;line-height:1.6;font-size:0.875rem;"></p>
+    </div>
+    <div class="detail-tab-content" id="tab-corrective">
+      <ol class="steps-list" id="dCorrective"></ol>
+    </div>
+    <div class="detail-tab-content" id="tab-internal">
+      <p id="dInternal" style="color:#94a3b8;line-height:1.6;font-size:0.875rem;"></p>
+    </div>
+    <div class="detail-tab-content" id="tab-sources">
+      <div class="sources-list" id="dSources"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let allEntries = [];
+  let filtered = [];
+  let sortCol = 'device';
+  let sortAsc = true;
+
+  const DEVICE_LABELS = {
+    INV: 'Inverter', BMU: 'Battery', GMS: 'Gateway',
+    MANTA: 'Smart Disconnect', MI: 'Micro-Inverter', PWRmicro: 'PWRmicro',
+  };
+
+  async function loadData() {
+    const res = await fetch('/api/kb-entries');
+    const data = await res.json();
+    allEntries = data.entries;
+    document.getElementById('entryCount').textContent = `${data.total} entries`;
+
+    if (data.last_rebuild) {
+      const r = data.last_rebuild;
+      const ts = r.ts ? new Date(r.ts).toLocaleDateString() : '';
+      document.getElementById('rebuildInfo').innerHTML =
+        `Last rebuilt <strong>${ts}</strong> from <strong>${r.repo || 'source repos'}</strong>` +
+        (r.pr_number ? ` · PR #${r.pr_number}` : '') +
+        (r.commit_sha ? ` · <code style="font-size:0.75rem">${r.commit_sha.slice(0,7)}</code>` : '') +
+        ` · ${r.kb_entries || data.total} entries`;
+      document.getElementById('rebuildBanner').style.display = 'flex';
+    }
+
+    applyFilters();
+  }
+
+  function deviceClass(d) {
+    if (!d) return 'device-other';
+    if (d.startsWith('PWRmicro')) return 'device-PWRmicro';
+    return `device-${d}` in {'device-INV':1,'device-BMU':1,'device-GMS':1,'device-MANTA':1,'device-MI':1}
+      ? `device-${d}` : 'device-other';
+  }
+
+  function severityClass(s) {
+    if (!s) return 'sev-info';
+    const sl = s.toLowerCase();
+    if (sl.includes('critical') || sl.includes('1')) return 'sev-critical';
+    if (sl.includes('high') || sl.includes('2')) return 'sev-high';
+    if (sl.includes('medium') || sl.includes('3')) return 'sev-medium';
+    if (sl.includes('low') || sl.includes('4')) return 'sev-low';
+    return 'sev-info';
+  }
+
+  function severityShort(s) {
+    if (!s) return 'Info';
+    if (s.toLowerCase().includes('critical')) return 'Critical';
+    if (s.toLowerCase().includes('high')) return 'High';
+    if (s.toLowerCase().includes('medium')) return 'Medium';
+    if (s.toLowerCase().includes('low')) return 'Low';
+    return s.split('(')[0].trim() || 'Info';
+  }
+
+  function renderRows() {
+    const tbody = document.getElementById('kbBody');
+    if (!filtered.length) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:#475569;">No matching alarms found.</td></tr>`;
+      document.getElementById('resultCount').textContent = '0 results';
+      return;
+    }
+    document.getElementById('resultCount').textContent = `${filtered.length} result${filtered.length !== 1 ? 's' : ''}`;
+
+    tbody.innerHTML = filtered.map((e, i) => {
+      const visIcons = Object.entries(e.visibility || {})
+        .filter(([,v]) => v)
+        .map(([k]) => k.charAt(0).toUpperCase())
+        .join(' · ');
+      const desc = (e.description || '').slice(0, 120) + ((e.description || '').length > 120 ? '…' : '');
+      const friendly = e.friendly_name || e.alarm_name || '';
+      const deviceLabel = DEVICE_LABELS[e.device] || e.device || '—';
+      return `<tr onclick="openDetail(${i})">
+        <td><span class="device-chip ${deviceClass(e.device)}">${deviceLabel}</span></td>
+        <td class="code-cell">${e.alarm_code || '—'}</td>
+        <td class="name-cell"><span class="truncate" style="max-width:260px" title="${friendly}">${friendly || e.alarm_name}</span></td>
+        <td><span class="severity-chip ${severityClass(e.severity)}">${severityShort(e.severity)}</span></td>
+        <td style="color:#94a3b8;white-space:nowrap">${e.alarm_type || '—'}</td>
+        <td class="desc-cell"><span class="truncate" style="max-width:300px" title="${e.description || ''}">${desc || '—'}</span></td>
+        <td style="color:#64748b;font-size:0.8rem;white-space:nowrap">${visIcons || '—'}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  function applyFilters() {
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    const device = document.getElementById('deviceFilter').value;
+    const severity = document.getElementById('severityFilter').value.toLowerCase();
+    const vis = document.getElementById('visFilter').value;
+
+    filtered = allEntries.filter(e => {
+      if (device && e.device !== device && !e.device?.startsWith(device)) return false;
+      if (severity && !e.severity.toLowerCase().includes(severity)) return false;
+      if (vis) {
+        const v = e.visibility || {};
+        if (vis === 'homeowner' && !v.homeowner) return false;
+        if (vis === 'installer' && !v.installer) return false;
+        if (vis === 'support' && (v.homeowner || v.installer)) return false;
+      }
+      if (search) {
+        const hay = [e.alarm_name, e.friendly_name, e.alarm_code, e.description, e.corrective_action, e.device].join(' ').toLowerCase();
+        if (!hay.includes(search)) return false;
+      }
+      return true;
+    });
+
+    // Sort
+    filtered.sort((a, b) => {
+      let av = (a[sortCol] || '').toLowerCase();
+      let bv = (b[sortCol] || '').toLowerCase();
+      if (av < bv) return sortAsc ? -1 : 1;
+      if (av > bv) return sortAsc ? 1 : -1;
+      return 0;
+    });
+
+    renderRows();
+  }
+
+  function sortBy(col) {
+    if (sortCol === col) { sortAsc = !sortAsc; }
+    else { sortCol = col; sortAsc = true; }
+    document.querySelectorAll('thead th').forEach(th => th.classList.remove('sorted'));
+    const idx = ['device','alarm_code','friendly_name','severity','alarm_type'].indexOf(col);
+    if (idx >= 0) document.querySelectorAll('thead th')[idx].classList.add('sorted');
+    applyFilters();
+  }
+
+  document.getElementById('searchInput').addEventListener('input', applyFilters);
+  document.getElementById('deviceFilter').addEventListener('change', applyFilters);
+  document.getElementById('severityFilter').addEventListener('change', applyFilters);
+  document.getElementById('visFilter').addEventListener('change', applyFilters);
+
+  // ── Detail panel ──
+  function openDetail(idx) {
+    const e = filtered[idx];
+    document.getElementById('dTitle').textContent = e.friendly_name || e.alarm_name || e.id;
+    document.getElementById('dSubtitle').textContent = e.alarm_name || '';
+    document.getElementById('dDevice').textContent = DEVICE_LABELS[e.device] || e.device || '—';
+    document.getElementById('dCode').textContent = e.alarm_code || '—';
+    document.getElementById('dSeverity').textContent = e.severity || '—';
+    document.getElementById('dType').textContent = e.alarm_type || '—';
+    document.getElementById('dDescription').textContent = e.description || 'No description available.';
+    document.getElementById('dInternal').textContent = e.internal_notes || 'No internal notes.';
+
+    // Corrective action steps
+    const steps = e.corrective_action ? e.corrective_action.split(' | ').filter(Boolean) : [];
+    document.getElementById('dCorrective').innerHTML = steps.length
+      ? steps.map(s => `<li>${s}</li>`).join('')
+      : '<li style="color:#475569">No corrective action documented.</li>';
+
+    // Visibility
+    const vis = e.visibility || {};
+    document.getElementById('dVisibility').innerHTML = ['homeowner','installer','support']
+      .map(k => `<span class="vis-badge ${vis[k] ? 'vis-yes' : 'vis-no'}">${k.charAt(0).toUpperCase() + k.slice(1)}</span>`)
+      .join('');
+
+    // Sources
+    const srcs = e.sources || [];
+    document.getElementById('dSources').innerHTML = srcs.length
+      ? srcs.map(s => `<span class="source-tag">${s}</span>`).join('')
+      : '<span style="color:#475569">No sources recorded.</span>';
+
+    // Reset to first tab
+    switchTab('description');
+    document.getElementById('detailOverlay').classList.add('open');
+  }
+
+  function closeDetail(e) {
+    if (e.target === document.getElementById('detailOverlay')) closeDetailBtn();
+  }
+  function closeDetailBtn() {
+    document.getElementById('detailOverlay').classList.remove('open');
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDetailBtn(); });
+
+  function switchTab(name) {
+    document.querySelectorAll('.detail-tab').forEach((t, i) => {
+      const names = ['description','corrective','internal','sources'];
+      t.classList.toggle('active', names[i] === name);
+    });
+    document.querySelectorAll('.detail-tab-content').forEach(c => {
+      c.classList.toggle('active', c.id === `tab-${name}`);
+    });
+  }
+
+  // ── CSV export ──
+  function exportCSV() {
+    const headers = ['Device','Alarm Code','Friendly Name','Alarm Name','Severity','Type','Description','Corrective Action','Homeowner','Installer','Support','Sources'];
+    const rows = filtered.map(e => [
+      e.device, e.alarm_code, e.friendly_name, e.alarm_name, e.severity, e.alarm_type,
+      e.description, e.corrective_action,
+      e.visibility?.homeowner ? 'Yes' : 'No',
+      e.visibility?.installer ? 'Yes' : 'No',
+      e.visibility?.support   ? 'Yes' : 'No',
+      (e.sources || []).join('; '),
+    ].map(v => `"${(v || '').replace(/"/g, '""')}"`));
+
+    const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+    a.download = `alarm-kb-${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+  }
+
+  loadData();
+</script>
+</body>
+</html>

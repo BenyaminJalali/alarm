@@ -24,7 +24,9 @@ GITHUB_CLIENT_ID = os.environ.get("GITHUB_CLIENT_ID", "")
 GITHUB_CLIENT_SECRET = os.environ.get("GITHUB_CLIENT_SECRET", "")
 GITHUB_CALLBACK_URL = os.environ.get("GITHUB_CALLBACK_URL", "https://alarm.dash-ly.com/admin/callback")
 ADMIN_GITHUB_USER = os.environ.get("ADMIN_GITHUB_USER", "BenyaminJalali")
+KB_REBUILD_SECRET = os.environ.get("KB_REBUILD_SECRET", "")
 CONVERSATIONS_PATH = Path(__file__).parent.parent / "data" / "conversations.jsonl"
+KB_REBUILD_LOG_PATH = Path(__file__).parent.parent / "data" / "kb_rebuild_log.jsonl"
 
 app.secret_key = FLASK_SECRET_KEY
 app.config["MAX_CONTENT_LENGTH"] = 20 * 1024 * 1024  # 20MB
@@ -380,6 +382,154 @@ def index():
     return render_template("index.html")
 
 
+@app.route("/kb")
+def kb_page():
+    return render_template("kb.html")
+
+
+@app.route("/generate")
+def generate_page():
+    return render_template("generate.html")
+
+
+@app.route("/api/generate-entry", methods=["POST"])
+def generate_entry():
+    """
+    Generate all three audience-level KB entries for a given alarm in one shot.
+    Returns JSON with homeowner, installer, and support responses.
+    """
+    data = request.json or {}
+    alarm_query = data.get("query", "").strip()
+    if not alarm_query:
+        return jsonify({"error": "No alarm query provided"}), 400
+
+    kb_context = build_context_block(alarm_query)
+
+    GENERATE_SYSTEM = """You are a technical writer for Generac Home Energy systems.
+Given an alarm or fault description, write a concise knowledge base entry for the specified audience.
+Be specific, accurate, and use only information supported by the knowledge base provided.
+Do not fabricate thresholds, steps, or causes not in the KB.
+"""
+
+    audience_prompts = {
+        "homeowner": (
+            "AUDIENCE: Homeowner (non-technical, plain English only)\n"
+            "Write a short 4-part entry:\n"
+            "1. What happened (one plain-English sentence)\n"
+            "2. What it means for their home (safe? will power stay on?)\n"
+            "3. One thing they can try themselves\n"
+            "4. When to call their installer\n"
+            "No codes, no technical terms, no jargon."
+        ),
+        "installer": (
+            "AUDIENCE: Installer / Dealer (trained technician)\n"
+            "Write a structured diagnostic entry:\n"
+            "1. What's happening (plain summary)\n"
+            "2. Which device\n"
+            "3. Root causes\n"
+            "4. Urgency level (Critical / High / Medium / Low)\n"
+            "5. Step-by-step fix (numbered)\n"
+            "6. When to escalate to Generac Technical Support\n"
+            "Use technical terms but define each one briefly."
+        ),
+        "support": (
+            "AUDIENCE: Support / TSE (Generac internal engineer)\n"
+            "Write a full technical entry:\n"
+            "1. Full technical description with thresholds and triggers\n"
+            "2. All related alarms and cascading causes\n"
+            "3. Internal diagnostic steps (firmware context, CAN diagnostics, etc.)\n"
+            "4. Internal notes and escalation path\n"
+            "Include everything from the installer view plus internal detail."
+        ),
+    }
+
+    bedrock = boto3.client("bedrock-runtime", region_name=AWS_REGION)
+
+    def call_bedrock(audience, prompt):
+        system = GENERATE_SYSTEM + f"\n\n## Alarm Knowledge Base\n{kb_context}"
+        body = json.dumps({
+            "anthropic_version": "bedrock-2023-05-31",
+            "max_tokens": 1024,
+            "system": system,
+            "messages": [{"role": "user", "content": f"{prompt}\n\nAlarm / fault to document:\n{alarm_query}"}],
+        })
+        try:
+            resp = bedrock.invoke_model(
+                modelId=BEDROCK_MODEL_ID,
+                contentType="application/json",
+                accept="application/json",
+                body=body,
+            )
+            result = json.loads(resp["body"].read())
+            return result["content"][0]["text"]
+        except Exception as e:
+            return f"Error generating {audience} entry: {str(e)}"
+
+    import concurrent.futures
+    results = {}
+    with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+        futures = {
+            executor.submit(call_bedrock, aud, prompt): aud
+            for aud, prompt in audience_prompts.items()
+        }
+        for future in concurrent.futures.as_completed(futures):
+            aud = futures[future]
+            results[aud] = future.result()
+
+    return jsonify({
+        "homeowner": results.get("homeowner", ""),
+        "installer": results.get("installer", ""),
+        "support": results.get("support", ""),
+        "query": alarm_query,
+    })
+
+
+@app.route("/api/kb-entries")
+def kb_entries():
+    kb = load_knowledge_base()
+    entries = kb.get("entries", [])
+    # Return a compact version suitable for the table
+    rows = []
+    for e in entries:
+        eng = e.get("engineering", {})
+        prod = e.get("product", {})
+        ts = eng.get("troubleshooting") or prod.get("corrective_action") or []
+        if isinstance(ts, list):
+            ts_text = " | ".join(ts)
+        else:
+            ts_text = str(ts)
+        rows.append({
+            "id": e.get("id", ""),
+            "alarm_name": e.get("alarm_name", "") or e.get("id", ""),
+            "friendly_name": e.get("friendly_name", ""),
+            "device": e.get("device", ""),
+            "alarm_code": e.get("alarm_code", ""),
+            "severity": e.get("severity", ""),
+            "alarm_type": e.get("alarm_type", ""),
+            "description": eng.get("description") or prod.get("description") or "",
+            "corrective_action": ts_text,
+            "internal_notes": eng.get("internal_notes", ""),
+            "sources": e.get("sources", []),
+            "visibility": e.get("visibility", {}),
+        })
+    rebuild_log = []
+    if KB_REBUILD_LOG_PATH.exists():
+        with open(KB_REBUILD_LOG_PATH) as f:
+            for line in f:
+                try:
+                    rebuild_log.append(json.loads(line.strip()))
+                except Exception:
+                    pass
+    last_rebuild = next(
+        (r for r in reversed(rebuild_log) if r.get("event") == "rebuild_success"), None
+    )
+    return jsonify({
+        "entries": rows,
+        "total": len(rows),
+        "last_rebuild": last_rebuild,
+    })
+
+
 @app.route("/api/chat", methods=["POST"])
 def chat():
     data = request.json or {}
@@ -538,6 +688,13 @@ def convert_image():
         return jsonify({"error": str(e)}), 500
 
 
+def _invalidate_kb_cache():
+    """Drop in-memory KB so the next request reloads from disk."""
+    global _knowledge_base, _kb_index
+    _knowledge_base = None
+    _kb_index = None
+
+
 @app.route("/api/health")
 def health():
     kb = load_knowledge_base()
@@ -550,6 +707,89 @@ def health():
         "kb_entries": len(kb.get("entries", [])),
         "kb_sources": kb.get("sources", []),
         "resolved_cases": resolved_count,
+    })
+
+
+@app.route("/api/rebuild-kb", methods=["POST"])
+def rebuild_kb():
+    """
+    Called by GitHub Actions in source repos when alarm-related files change.
+    Requires X-Rebuild-Secret header matching KB_REBUILD_SECRET env var.
+    Logs the triggering PR metadata for firmware version tracking.
+    """
+    if not KB_REBUILD_SECRET:
+        return jsonify({"error": "Rebuild endpoint not configured"}), 503
+
+    secret = request.headers.get("X-Rebuild-Secret", "")
+    if not secrets.compare_digest(secret, KB_REBUILD_SECRET):
+        return jsonify({"error": "Unauthorized"}), 401
+
+    data = request.json or {}
+    repo = data.get("repo", "unknown")
+    pr_number = data.get("pr_number", "")
+    pr_title = data.get("pr_title", "")
+    branch = data.get("branch", "")
+    commit_sha = data.get("commit_sha", "")
+    triggered_by = data.get("triggered_by", "")
+    changed_files = data.get("changed_files", [])
+
+    # Log trigger event with full PR context for firmware audit trail
+    log_entry = {
+        "ts": datetime.datetime.utcnow().isoformat(),
+        "event": "rebuild_triggered",
+        "repo": repo,
+        "pr_number": pr_number,
+        "pr_title": pr_title,
+        "branch": branch,
+        "commit_sha": commit_sha,
+        "triggered_by": triggered_by,
+        "changed_files": changed_files[:50],
+    }
+    try:
+        with open(KB_REBUILD_LOG_PATH, "a") as f:
+            f.write(json.dumps(log_entry) + "\n")
+    except Exception:
+        pass
+
+    # Run the KB builder script
+    import subprocess
+    build_script = Path(__file__).parent / "build_knowledge_base.py"
+    try:
+        result = subprocess.run(
+            ["python", str(build_script)],
+            capture_output=True, text=True, timeout=300,
+            env={**os.environ},
+        )
+        success = result.returncode == 0
+        output = (result.stdout + result.stderr)[-2000:]
+    except subprocess.TimeoutExpired:
+        return jsonify({"error": "KB rebuild timed out"}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+    if not success:
+        log_entry["event"] = "rebuild_failed"
+        log_entry["output"] = output
+        with open(KB_REBUILD_LOG_PATH, "a") as f:
+            f.write(json.dumps(log_entry) + "\n")
+        return jsonify({"error": "KB build failed", "output": output}), 500
+
+    # Invalidate in-memory cache so next request picks up fresh KB
+    _invalidate_kb_cache()
+    kb = load_knowledge_base()
+
+    # Log success with entry count
+    log_entry["event"] = "rebuild_success"
+    log_entry["kb_entries"] = len(kb.get("entries", []))
+    with open(KB_REBUILD_LOG_PATH, "a") as f:
+        f.write(json.dumps(log_entry) + "\n")
+
+    return jsonify({
+        "ok": True,
+        "kb_entries": len(kb.get("entries", [])),
+        "repo": repo,
+        "pr_number": pr_number,
+        "commit_sha": commit_sha,
     })
 
 

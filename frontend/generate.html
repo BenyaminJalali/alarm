@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KB Entry Generator — Generac R2</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0f1117;
+      color: #e2e8f0;
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+      min-height: 100vh;
+    }
+
+    .page-header {
+      background: #1a1d27;
+      border-bottom: 1px solid #2a2d3a;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .logo { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+    .back-link { color: #64748b; text-decoration: none; font-size: 0.85rem; }
+    .back-link:hover { color: #e2e8f0; }
+    .kb-link { color: #64748b; text-decoration: none; font-size: 0.85rem; }
+    .kb-link:hover { color: #e2e8f0; }
+
+    .main { max-width: 1400px; margin: 0 auto; padding: 24px; }
+
+    .query-section {
+      background: #1a1d27;
+      border: 1px solid #2a2d3a;
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+    }
+    .query-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #64748b;
+      margin-bottom: 10px;
+    }
+    .query-row { display: flex; gap: 10px; }
+    .query-input {
+      flex: 1;
+      background: #0f1117;
+      border: 1px solid #2a2d3a;
+      border-radius: 7px;
+      padding: 10px 14px;
+      color: #e2e8f0;
+      font-size: 0.9rem;
+      resize: none;
+    }
+    .query-input:focus { outline: none; border-color: #E8500A; }
+    .generate-btn {
+      background: #E8500A;
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      padding: 10px 20px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+      align-self: flex-start;
+    }
+    .generate-btn:hover { background: #d14509; }
+    .generate-btn:disabled { background: #374151; color: #6b7280; cursor: not-allowed; }
+    .query-hint { color: #475569; font-size: 0.8rem; margin-top: 8px; }
+    .query-hint strong { color: #64748b; }
+
+    /* Three column layout */
+    .columns {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    @media (max-width: 900px) {
+      .columns { grid-template-columns: 1fr; }
+    }
+
+    .col-card {
+      background: #1a1d27;
+      border: 1px solid #2a2d3a;
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .col-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid #2a2d3a;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .col-title {
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .audience-dot {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    }
+    .dot-homeowner { background: #4ade80; }
+    .dot-installer { background: #60a5fa; }
+    .dot-support   { background: #c084fc; }
+
+    .col-subtitle { color: #475569; font-size: 0.75rem; }
+    .copy-btn {
+      background: none; border: 1px solid #2a2d3a; border-radius: 5px;
+      color: #64748b; padding: 4px 10px; font-size: 0.75rem; cursor: pointer;
+    }
+    .copy-btn:hover { border-color: #475569; color: #e2e8f0; }
+
+    .col-body {
+      padding: 18px;
+      flex: 1;
+      min-height: 300px;
+      position: relative;
+    }
+
+    .placeholder {
+      color: #374151;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      text-align: center;
+      padding-top: 60px;
+    }
+    .placeholder svg { display: block; margin: 0 auto 12px; opacity: 0.3; }
+
+    .spinner {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding-top: 80px;
+      flex-direction: column;
+      gap: 14px;
+      color: #475569;
+      font-size: 0.8rem;
+    }
+    .spinner.active { display: flex; }
+    .spin-ring {
+      width: 28px; height: 28px;
+      border: 3px solid #2a2d3a;
+      border-top-color: #E8500A;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .entry-text {
+      display: none;
+      color: #cbd5e1;
+      font-size: 0.875rem;
+      line-height: 1.7;
+      white-space: pre-wrap;
+    }
+    .entry-text.active { display: block; }
+
+    /* Copy feedback */
+    .copy-btn.copied { border-color: #4ade80; color: #4ade80; }
+
+    .status-bar {
+      padding: 10px 24px;
+      background: #1a1d27;
+      border-top: 1px solid #2a2d3a;
+      font-size: 0.8rem;
+      color: #475569;
+      margin-top: 24px;
+      border-radius: 8px;
+      display: none;
+    }
+    .status-bar.active { display: block; }
+  </style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="header-left">
+    <a href="/" class="back-link">← Back to Chat</a>
+    <div class="logo">
+      <svg width="22" height="22" viewBox="0 0 28 28" fill="none">
+        <rect width="28" height="28" rx="6" fill="#E8500A"/>
+        <path d="M7 14h14M14 7v14" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      KB Entry Generator
+    </div>
+  </div>
+  <a href="/kb" class="kb-link">View KB Database →</a>
+</div>
+
+<div class="main">
+  <div class="query-section">
+    <div class="query-label">Alarm or fault to document</div>
+    <div class="query-row">
+      <textarea class="query-input" id="queryInput" rows="2"
+        placeholder="e.g. Battery ground fault warning · Battery communication error · Inverter AC overcurrent · Self-test failed · Gateway offline"></textarea>
+      <button class="generate-btn" id="generateBtn" onclick="generate()">Generate All Three</button>
+    </div>
+    <div class="query-hint">
+      Enter an alarm name, code, or plain-language description.
+      <strong>All three audience views generate simultaneously.</strong>
+      Takes ~5–10 seconds.
+    </div>
+  </div>
+
+  <div class="columns">
+
+    <!-- Homeowner -->
+    <div class="col-card">
+      <div class="col-header">
+        <div>
+          <div class="col-title">
+            <span class="audience-dot dot-homeowner"></span>
+            Homeowner
+          </div>
+          <div class="col-subtitle">Plain English · Non-technical · Fusion app</div>
+        </div>
+        <button class="copy-btn" onclick="copyCol('homeowner')">Copy</button>
+      </div>
+      <div class="col-body">
+        <div class="placeholder" id="ph-homeowner">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" stroke="currentColor" stroke-width="1.5"/></svg>
+          Homeowner entry will appear here
+        </div>
+        <div class="spinner" id="sp-homeowner"><div class="spin-ring"></div>Generating…</div>
+        <div class="entry-text" id="et-homeowner"></div>
+      </div>
+    </div>
+
+    <!-- Installer -->
+    <div class="col-card">
+      <div class="col-header">
+        <div>
+          <div class="col-title">
+            <span class="audience-dot dot-installer"></span>
+            Installer / Dealer
+          </div>
+          <div class="col-subtitle">Technical · Step-by-step · Field Pro</div>
+        </div>
+        <button class="copy-btn" onclick="copyCol('installer')">Copy</button>
+      </div>
+      <div class="col-body">
+        <div class="placeholder" id="ph-installer">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z" stroke="currentColor" stroke-width="1.5"/></svg>
+          Installer entry will appear here
+        </div>
+        <div class="spinner" id="sp-installer"><div class="spin-ring"></div>Generating…</div>
+        <div class="entry-text" id="et-installer"></div>
+      </div>
+    </div>
+
+    <!-- Support -->
+    <div class="col-card">
+      <div class="col-header">
+        <div>
+          <div class="col-title">
+            <span class="audience-dot dot-support"></span>
+            Support / TSE
+          </div>
+          <div class="col-subtitle">Full depth · Internal notes · Fleet</div>
+        </div>
+        <button class="copy-btn" onclick="copyCol('support')">Copy</button>
+      </div>
+      <div class="col-body">
+        <div class="placeholder" id="ph-support">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/><path d="M12 8v4l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Support entry will appear here
+        </div>
+        <div class="spinner" id="sp-support"><div class="spin-ring"></div>Generating…</div>
+        <div class="entry-text" id="et-support"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="status-bar" id="statusBar"></div>
+</div>
+
+<script>
+  let lastResults = null;
+
+  async function generate() {
+    const query = document.getElementById('queryInput').value.trim();
+    if (!query) {
+      document.getElementById('queryInput').focus();
+      return;
+    }
+
+    const btn = document.getElementById('generateBtn');
+    btn.disabled = true;
+    btn.textContent = 'Generating…';
+
+    // Show spinners, hide placeholders and previous results
+    ['homeowner','installer','support'].forEach(aud => {
+      document.getElementById(`ph-${aud}`).style.display = 'none';
+      document.getElementById(`sp-${aud}`).classList.add('active');
+      document.getElementById(`et-${aud}`).classList.remove('active');
+      document.getElementById(`et-${aud}`).textContent = '';
+    });
+
+    document.getElementById('statusBar').classList.remove('active');
+
+    try {
+      const res = await fetch('/api/generate-entry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query }),
+      });
+      if (!res.ok) throw new Error(`Server error ${res.status}`);
+      const data = await res.json();
+      lastResults = data;
+
+      ['homeowner','installer','support'].forEach(aud => {
+        document.getElementById(`sp-${aud}`).classList.remove('active');
+        const el = document.getElementById(`et-${aud}`);
+        el.textContent = data[aud] || 'No output generated.';
+        el.classList.add('active');
+      });
+
+      const bar = document.getElementById('statusBar');
+      bar.textContent = `Generated for: "${query}" — review and correct before adding to KB.`;
+      bar.classList.add('active');
+    } catch (err) {
+      ['homeowner','installer','support'].forEach(aud => {
+        document.getElementById(`sp-${aud}`).classList.remove('active');
+        const el = document.getElementById(`et-${aud}`);
+        el.textContent = `Error: ${err.message}`;
+        el.classList.add('active');
+      });
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Generate All Three';
+    }
+  }
+
+  function copyCol(aud) {
+    const text = document.getElementById(`et-${aud}`).textContent;
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = event.currentTarget;
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+    });
+  }
+
+  // Submit on Ctrl+Enter / Cmd+Enter
+  document.getElementById('queryInput').addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') generate();
+  });
+</script>
+</body>
+</html>

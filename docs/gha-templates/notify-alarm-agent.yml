@@ -1,0 +1,73 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# notify-alarm-agent.yml
+#
+# Add this file to each source repo at:
+#   .github/workflows/notify-alarm-agent.yml
+#
+# Required repo secret:  KB_REBUILD_SECRET  (same value as on alarm server)
+#
+# Watches for merged PRs that touch alarm-related files and triggers a KB
+# rebuild on alarm.dash-ly.com — no code in this repo is modified.
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: Notify Alarm Agent on Alarm Changes
+
+on:
+  pull_request:
+    types: [closed]
+    # ── Customize paths per repo ──────────────────────────────────────────────
+    # generacclean/generac-home-error-catalog:
+    #   paths: ['**/*.yaml', '**/*.yml']
+    #
+    # neurio/pwrinverter:
+    #   paths: ['ExtendedDescriptions/**']
+    #
+    # neurio/pwrbmu:
+    #   paths: ['ExtendedDescriptions/**']
+    #
+    # neurio/reef:
+    #   paths: ['source/application/headend/event-manager/headend-events.json']
+    #
+    # Uncomment and keep only the paths block that matches this repo:
+    paths:
+      - '**/*.yaml'
+      - '**/*.yml'
+      - 'ExtendedDescriptions/**'
+      - 'source/application/headend/event-manager/headend-events.json'
+
+jobs:
+  notify-alarm-agent:
+    # Only runs when the PR is actually merged (not just closed/rejected)
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Collect changed files
+        id: changed
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const files = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              per_page: 100,
+            });
+            const names = files.data.map(f => f.filename);
+            core.setOutput('files', JSON.stringify(names));
+
+      - name: Trigger KB rebuild
+        run: |
+          curl -s -f -X POST https://alarm.dash-ly.com/api/rebuild-kb \
+            -H "Content-Type: application/json" \
+            -H "X-Rebuild-Secret: ${{ secrets.KB_REBUILD_SECRET }}" \
+            -d '{
+              "repo":         "${{ github.repository }}",
+              "pr_number":    "${{ github.event.pull_request.number }}",
+              "pr_title":     "${{ github.event.pull_request.title }}",
+              "branch":       "${{ github.event.pull_request.head.ref }}",
+              "commit_sha":   "${{ github.event.pull_request.merge_commit_sha }}",
+              "triggered_by": "${{ github.event.pull_request.merged_by.login }}",
+              "changed_files": ${{ steps.changed.outputs.files }}
+            }' \
+            --max-time 320
