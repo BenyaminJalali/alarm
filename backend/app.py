@@ -383,11 +383,6 @@ def index():
     return render_template("index.html")
 
 
-@app.route("/kb")
-def kb_page():
-    return render_template("kb.html")
-
-
 @app.route("/generate")
 def generate_page():
     return render_template("generate.html")
