@@ -33,10 +33,21 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Sego
 .sidebar-section { padding: 16px; border-bottom: 1px solid var(--border); }
 .section-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dimmer); margin-bottom: 10px; }
 
-.role-buttons { display: flex; flex-direction: column; gap: 6px; }
-.role-btn { background: var(--dark-3); border: 1px solid var(--border); color: var(--text-dim); padding: 8px 12px; border-radius: 6px; cursor: pointer; text-align: left; font-size: 13px; transition: all 0.15s; }
-.role-btn:hover { background: var(--dark-2); color: var(--text); }
-.role-btn.active { background: var(--orange); border-color: var(--orange); color: white; font-weight: 600; }
+/* Audience toggles */
+.audience-toggles { display: flex; flex-direction: column; gap: 5px; }
+.aud-toggle {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--dark-3); border: 1px solid var(--border);
+  color: var(--text-dimmer); padding: 8px 10px; border-radius: 6px;
+  cursor: pointer; text-align: left; font-size: 13px; transition: all 0.15s;
+}
+.aud-toggle:hover { border-color: var(--text-dimmer); color: var(--text); }
+.aud-toggle.active { background: var(--dark-2); border-color: var(--border); color: var(--text); }
+.aud-toggle .aud-check { margin-left: auto; font-size: 11px; opacity: 0; color: var(--orange); }
+.aud-toggle.active .aud-check { opacity: 1; }
+.aud-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; opacity: 0.4; }
+.aud-toggle.active .aud-dot { opacity: 1; }
+.aud-hint { font-size: 11px; color: var(--text-dimmer); margin-top: 8px; line-height: 1.4; }
 
 .device-tags { display: flex; flex-wrap: wrap; gap: 6px; }
 .tag { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; }
@@ -161,6 +172,7 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Sego
   min-height: 0;
 }
 .audience-col:last-child { border-right: none; }
+.audience-col.hidden { display: none; }
 
 .col-label {
   display: flex;

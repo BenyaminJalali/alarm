@@ -388,9 +388,6 @@ def kb_page():
     return render_template("kb.html")
 
 
-@app.route("/generate")
-def generate_page():
-    return render_template("generate.html")
 
 
 @app.route("/api/generate-entry", methods=["POST"])

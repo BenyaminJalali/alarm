@@ -14,10 +14,14 @@
   const micBtn     = document.getElementById("micBtn");
   const imagePreviewBar = document.getElementById("imagePreviewBar");
 
-  const AUDIENCES = ["homeowner", "installer", "support"];
+  const ALL_AUDIENCES = ["homeowner", "installer", "support"];
+  const AUD_LABELS = { homeowner: "Homeowner", installer: "Installer", support: "Support / TSE" };
 
-  // Per-audience conversation history
+  // Per-audience conversation history — persists across toggle changes
   const histories = { homeowner: [], installer: [], support: [] };
+
+  // Which audiences are currently active (visible + will be called on next send)
+  let activeAudiences = new Set(["installer"]);
 
   let isStreaming   = false;
   let pendingImages = [];
@@ -30,6 +34,45 @@
     .then(d => { kbStatus.textContent = `KB: ${d.kb_entries} alarms loaded`; })
     .catch(() => { kbStatus.textContent = "KB: offline"; });
 
+  // ── Audience toggles ───────────────────────────────────────────────────────
+  function updateColumns() {
+    // Show/hide columns
+    ALL_AUDIENCES.forEach(aud => {
+      const col = document.getElementById(`col-${aud}`);
+      col.classList.toggle("hidden", !activeAudiences.has(aud));
+    });
+
+    // Update subtitle
+    const subtitle = document.getElementById("chatSubtitle");
+    if (activeAudiences.size === 0) {
+      subtitle.textContent = "Select at least one view to get responses";
+    } else {
+      subtitle.textContent = "Showing: " + [...activeAudiences].map(a => AUD_LABELS[a]).join(" · ");
+    }
+
+    // Disable send if nothing active
+    sendBtn.disabled = (!inputEl.value.trim() && pendingImages.length === 0) || isStreaming || activeAudiences.size === 0;
+  }
+
+  document.querySelectorAll(".aud-toggle").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const aud = btn.dataset.aud;
+      if (activeAudiences.has(aud)) {
+        // Don't allow deselecting the last one
+        if (activeAudiences.size === 1) return;
+        activeAudiences.delete(aud);
+        btn.classList.remove("active");
+      } else {
+        activeAudiences.add(aud);
+        btn.classList.add("active");
+      }
+      updateColumns();
+    });
+  });
+
+  // Init column state to match default toggle state
+  updateColumns();
+
   // ── Example buttons ────────────────────────────────────────────────────────
   document.querySelectorAll(".example-btn").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -41,7 +84,7 @@
 
   // ── New chat ───────────────────────────────────────────────────────────────
   newChatBtn.addEventListener("click", () => {
-    AUDIENCES.forEach(aud => {
+    ALL_AUDIENCES.forEach(aud => {
       histories[aud] = [];
       const msgsEl = document.getElementById(`msgs-${aud}`);
       msgsEl.innerHTML = '<div class="col-empty">New conversation started. Ask a question below.</div>';
@@ -50,12 +93,12 @@
     renderImagePreviews();
     inputEl.value = "";
     inputEl.style.height = "auto";
-    sendBtn.disabled = true;
+    sendBtn.disabled = activeAudiences.size === 0;
   });
 
   // ── Input handling ─────────────────────────────────────────────────────────
   inputEl.addEventListener("input", () => {
-    sendBtn.disabled = (!inputEl.value.trim() && pendingImages.length === 0) || isStreaming;
+    sendBtn.disabled = (!inputEl.value.trim() && pendingImages.length === 0) || isStreaming || activeAudiences.size === 0;
     autoResize();
   });
 
@@ -232,18 +275,16 @@
       userContent = text;
     }
 
-    // Add user turn to all histories
-    AUDIENCES.forEach(aud => histories[aud].push({ role: "user", content: userContent }));
+    // Add user turn only to active audience histories
+    activeAudiences.forEach(aud => histories[aud].push({ role: "user", content: userContent }));
 
-    // Show user question and typing indicator in each column
+    // Show user question and typing indicator in each active column
     const typingEls = {};
-    AUDIENCES.forEach(aud => {
+    activeAudiences.forEach(aud => {
       const msgsEl = document.getElementById(`msgs-${aud}`);
-      // Clear empty placeholder on first message
       const empty = msgsEl.querySelector(".col-empty");
       if (empty) empty.remove();
 
-      // Question bubble (only show text in first column to save space; all columns get images)
       const turnEl = document.createElement("div");
       turnEl.className = "col-turn";
       let questionHtml = "";
@@ -254,7 +295,6 @@
       if (text) questionHtml += `<div class="col-question"><span style="opacity:0.5;flex-shrink:0">You:</span> ${escHtml(text)}</div>`;
       turnEl.innerHTML = questionHtml;
 
-      // Typing indicator
       const typingEl = document.createElement("div");
       typingEl.className = "col-typing";
       typingEl.innerHTML = `<div class="dot"></div><div class="dot"></div><div class="dot"></div>`;
@@ -265,11 +305,11 @@
       msgsEl.scrollTop = msgsEl.scrollHeight;
     });
 
-    // Fire three parallel streams
-    await Promise.all(AUDIENCES.map(aud => streamAudience(aud, typingEls[aud], text)));
+    // Fire streams only for active audiences
+    await Promise.all([...activeAudiences].map(aud => streamAudience(aud, typingEls[aud], text)));
 
     isStreaming = false;
-    sendBtn.disabled = !inputEl.value.trim() && !pendingImages.length;
+    sendBtn.disabled = (!inputEl.value.trim() && !pendingImages.length) || activeAudiences.size === 0;
   }
 
   async function streamAudience(audience, typingEl, question) {
